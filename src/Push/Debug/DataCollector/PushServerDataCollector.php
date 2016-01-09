@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Eole\Sandstone\Push\Debug\TraceablePushServerInterface;
+use Eole\Sandstone\Push\PushServerInterface;
 
 class PushServerDataCollector extends DataCollector
 {
@@ -15,14 +16,14 @@ class PushServerDataCollector extends DataCollector
     const NAME = 'sandstone.push_server';
 
     /**
-     * @var TraceablePushServerInterface
+     * @var PushServerInterface
      */
     private $pushServer;
 
     /**
-     * @param TraceablePushServerInterface $pushServer
+     * @param PushServerInterface $pushServer
      */
-    public function __construct(TraceablePushServerInterface $pushServer)
+    public function __construct(PushServerInterface $pushServer)
     {
         $this->pushServer = $pushServer;
         $this->updateMessages(array());
@@ -33,7 +34,9 @@ class PushServerDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $this->updateMessages($this->pushServer->getSentMessages());
+        if ($this->pushServer instanceof TraceablePushServerInterface) {
+            $this->updateMessages($this->pushServer->getSentMessages());
+        }
     }
 
     /**
