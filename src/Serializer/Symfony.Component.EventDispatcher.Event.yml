@@ -1,0 +1,5 @@
+Symfony\Component\EventDispatcher\Event:
+    exclusion_policy: NONE
+    properties:
+        propagationStopped:
+            type: boolean

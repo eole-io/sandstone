@@ -1,0 +1,42 @@
+{
+    "name":         "eole/sandstone",
+    "license":      "MIT",
+    "type":         "library",
+    "description":  "Extends Silex to easily mount a RestApi working together with a Websocket server through a Push server.",
+    "homepage":     "https://github.com/eole-io/sandstone",
+    "keywords":     ["php", "symfony", "silex", "websocket", "push", "reactphp"],
+    "authors": [
+        {
+            "name": "Julien Maulny",
+            "email": "doubjulien@hotmail.fr"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=5.5",
+        "ext-zmq": "*",
+        "react/zmq": "0.2.*|0.3.*",
+        "cboden/ratchet": "~0.3",
+        "league/oauth2-server": "4.1.x",
+        "symfony/event-dispatcher": "~3.0",
+        "symfony/security": "~2.8|~3.0",
+        "symfony/http-kernel": "~2.8|~3.0",
+        "symfony/http-foundation": "~2.8|~3.0",
+        "symfony/routing": "~2.8|~3.0",
+        "alcalyn/authorization-header-fix": "~1.0.0",
+        "jms-serializer/serializer": "^1.3.3",
+        "alcalyn/serializer-doctrine-proxies": "~1.1.0",
+        "pimple/pimple": "~3.0",
+        "silex/silex": "~2.0"
+    },
+    "require-dev": {
+        "ekho/zmq-phpdoc": "1.0",
+        "phpunit/phpunit": "4.8.*",
+        "squizlabs/php_codesniffer": "2.x"
+    },
+    "autoload": {
+        "psr-4": {
+            "Eole\\Sandstone\\": "src"
+        }
+    }
+}
