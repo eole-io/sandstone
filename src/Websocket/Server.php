@@ -33,14 +33,6 @@ class Server
     {
         $this->sandstoneApplication = $sandstoneApplication;
         $this->loop = Factory::create();
-
-        echo 'Initialization...'.PHP_EOL;
-
-        $this->initWebsocketServer();
-
-        if ($this->sandstoneApplication->isPushServerEnabled()) {
-            $this->initPushServer();
-        }
     }
 
     /**
@@ -95,6 +87,14 @@ class Server
      */
     public function run()
     {
+        echo 'Initialization...'.PHP_EOL;
+
+        $this->initWebsocketServer();
+
+        if ($this->sandstoneApplication->isPushServerEnabled()) {
+            $this->initPushServer();
+        }
+
         $this->sandstoneApplication->boot();
 
         $websocketBind = $this->sandstoneApplication['sandstone.websocket.server']['bind'];
@@ -103,7 +103,7 @@ class Server
         echo "Bind websocket server to $websocketBind:$websocketPort".PHP_EOL;
 
         if ($this->sandstoneApplication->isPushServerEnabled()) {
-            $pushBind = $this->sandstoneApplication['sandstone.push.server']['host'];
+            $pushBind = $this->sandstoneApplication['sandstone.push.server']['bind'];
             $pushPort = $this->sandstoneApplication['sandstone.push.server']['port'];
 
             echo "Bind push server to $pushBind:$pushPort".PHP_EOL;
