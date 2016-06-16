@@ -11,14 +11,14 @@ class TopicRouter
     /**
      * @var Application
      */
-    private $silexApp;
+    private $sandstoneApplication;
 
     /**
-     * @param Application $silexApp
+     * @param Application $sandstoneApplication
      */
-    public function __construct(Application $silexApp)
+    public function __construct(Application $sandstoneApplication)
     {
-        $this->silexApp = $silexApp;
+        $this->sandstoneApplication = $sandstoneApplication;
     }
 
     /**
@@ -30,7 +30,7 @@ class TopicRouter
      */
     public function loadTopic($topicPath)
     {
-        $urlMatcher = $this->silexApp['sandstone.websocket.url_matcher'];
+        $urlMatcher = $this->sandstoneApplication['sandstone.websocket.url_matcher'];
         $arguments = $urlMatcher->match('/'.$topicPath);
         $topicFactory = $arguments['_topic'];
 
