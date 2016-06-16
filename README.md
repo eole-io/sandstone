@@ -29,6 +29,8 @@ Then update your dependencies with `composer update`.
 
 ## Usage
 
+### Simple websocket server
+
 Mounting a simple multichannel chat server:
 
 **websocket-server.php**:
@@ -154,7 +156,7 @@ class ChatTopic extends Eole\Sandstone\Websocket\Topic
 ```
 
 
-## Push server
+### Push server
 
 Given you have built a RestApi and have websocket topics,
 you may want to broadcast a message through a topic when someone
