@@ -14,7 +14,7 @@ Requires:
 
 ### Download
 
-Using Composer:
+Using Composer ([eole/sandstone](https://packagist.org/packages/eole/sandstone)):
 
 ``` js
 {
@@ -28,6 +28,31 @@ Then update your dependencies with `composer update`.
 
 
 ## Usage
+
+### RestApi
+
+Sandstone extends [Silex](http://silex.sensiolabs.org/).
+
+Then, following Silex documentation, mounting a RestApi endpoint looks like that:
+
+``` php
+$app = new Eole\Sandstone\Application();
+
+$app->post('api/articles', function () use ($app) {
+    // Persisting article...
+
+    $articleId = 42;
+    $title = 'Unicorns spotted in Alaska';
+    $url = 'http://unicorn.com/articles/unicorns-spotted-alaska';
+
+    $app['dispatcher']->dispatch('article.created', new ArticleCreatedEvent($title, $url));
+
+    return new JsonResponse($articleId, 201);
+});
+
+$app->run();
+```
+
 
 ### Simple websocket server
 
@@ -156,15 +181,202 @@ class ChatTopic extends Eole\Sandstone\Websocket\Topic
 ```
 
 
+### Using Websocket server together with RestApi
+
+If you use both a RestApi and a websocket server,
+you should note that the websocket server is launched from command,
+while the RestApi, as a Silex application, is run from the web server.
+
+As this is two different application stacks, you should now have a your services stack
+in a base Application class:
+
+``` php
+class App extends Eole\Sandstone\Application
+{
+    public function __construct(array $values = array())
+    {
+        parent::__construct($values);
+
+        $this->register(new Eole\Sandstone\Serializer\ServiceProvider());
+
+        $this->register(new Eole\Sandstone\Websocket\ServiceProvider(), [
+            'sandstone.websocket.server' => [
+                'bind' => '0.0.0.0',
+                'port' => '8080',
+            ],
+        ]);
+
+        // Other services/stuff used both in RestApi and websocket server...
+    }
+}
+```
+
+Then your RestApi `index.php` file can now use `App` instead of `Eole\Sandstone\Application`:
+
+``` php
+$app = new App();
+
+$app->post('api/articles', function () {
+    // Persisting article...
+
+    $articleId = 42;
+    $title = 'Unicorns spotted in Alaska';
+    $url = 'http://unicorn.com/articles/unicorns-spotted-alaska';
+
+    $this['dispatcher']->dispatch('article.created', new ArticleCreatedEvent($title, $url));
+
+    return new JsonResponse($articleId, 201);
+});
+
+$app->run();
+```
+
+And the same for `websocket-server.php` script file is simplified:
+
+``` php
+$app = new App();
+
+$app->topic('chat/{channel}', function ($topicPattern) {
+    return new ChatTopic($topicPattern);
+});
+
+$websocketServer = new Eole\Sandstone\Websocket\Server($app);
+
+$websocketServer->run();
+```
+
+*Up to you to also refactor topics declaration, rest api endpoint... in a class,
+which becomes highly recommended for scaling bigger applications.*
+
+Now you have a Rest Api working with a websocket server,
+an interessant part of Sandstone can be aborded.
+
+
 ### Push server
 
-Given you have built a RestApi and have websocket topics,
-you may want to broadcast a message through a topic when someone
-changed the state of the application by hitting your RestApi with a `POST` http request.
+You may want to broadcast a message through a topic to all subscribing clients
+when someone changed the state of the application by hitting your RestApi with a `POST` http request.
 
-Sandstone integrates a ZMQ Push server.
+Sandstone integrates a ZMQ Push server, and is totally abstracted using Symfony event dispatcher:
+
+You don't have to *send message to Push server*,
+but instead you just *dispatch a simple event* through your application dispatcher.
+
+Sandstone will automatically forward your event through Push server from RestApi,
+and redispatch it to your websocket server, so that you just have to listen for your event from topics.
 
 
+#### Register Push server and configuration
+
+Register the `Eole\Sandstone\PushServer\ServiceProvider`:
+
+``` php
+class App extends Eole\Sandstone\Application
+{
+    public function __construct(array $values = array())
+    {
+        parent::__construct($values);
+
+        // Register Push Server
+        $this->register(new Eole\Sandstone\PushServer\ServiceProvider(), [
+            'sandstone.push.enabled' => true,
+            'sandstone.push.server' => [
+                'bind' => '127.0.0.1',
+                'host' => '127.0.0.1',
+                'port' => '5555',
+            ],
+        ]);
+    }
+}
+```
+
+> **Note**:
+> You should register the Push server service provider in your base application stack.
+
+
+#### Use Push server
+
+Just an example, you want to notify clients in chat channels when a new article is created:
+
+1. **RestApi controller**: dispatch an event on article creation:
+
+``` php
+// In the RestApi controller (POST /api/articles)
+$app['dispatcher']->dispatch('article.created', new ArticleCreatedEvent($title, $url));
+```
+
+2. **RestApi stack**: forward event to Push Server
+
+``` php
+// In the RestApi application stack
+$app->forwardEventToPushServer('article.created');
+```
+
+*This step is necessary as not ALL events should be forwarded: it may be unwanted in certain cases.
+So this line will automatically forward all future `article.created` events to Push server.*
+
+3. **Websocket topic**: Listen to this event from your Topic
+
+``` php
+use Eole\Sandstone\Websocket\Topic;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+// implement EventSubscriberInterface
+class ChatTopic extends Topic implements EventSubscriberInterface
+{
+    /**
+     * Subscribe to article.created event.
+     *
+     * {@InheritDoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+            'article.created' => 'onArticleCreated',
+        ];
+    }
+
+    /**
+     * Article created listener.
+     *
+     * @param ArticleCreatedEvent $event
+     */
+    public function onArticleCreated(ArticleCreatedEvent $event)
+    {
+        $this->broadcast([
+            'type' => 'article_created',
+            'message' => 'An article has just been created: '.$event->getTitle().', read it here: '.$event->getUrl(),
+        ]);
+    }
+}
+```
+
+That was all.
+
+By implementing `EventSubscriberInterface`,
+Sandstone automatically register your `ChatTopic` to event subscriber.
+
+Then, run all the websocket/push-server stack:
+
+``` shell
+$ php websocket-server.php
+Initialization...
+Bind websocket server to 0.0.0.0:8080
+Bind push server to 127.0.0.1:5555
+```
+
+
+## References
+
+Sandstone is built on a few other cool PHP libraries you may want to check documentation:
+
+- [Silex 2](http://silex.sensiolabs.org/) *for RestApi and application container ([Pimple](http://pimple.sensiolabs.org/))*
+- [Ratchet PHP](http://socketo.me/) *for websockets*
+- [ZeroMQ](http://zeromq.org/) *for Push server*
+- [WAMP protocol](http://wamp-proto.org/) (**v1**) *for topics pub/sub*
+- [JMS Serializer](http://jmsyst.com/libs/serializer) *to ensure serialization/deserialization between Sandstone components and client*
+- [Symfony EventDispatcher](http://symfony.com/doc/current/components/event_dispatcher/introduction.html) *for Push server abstraction `->forwardEventToPushServer()`*
+- [Symfony Routing](http://symfony.com/doc/current/components/routing/introduction.html) *for Topic declaration abstraction `$app->topic('chat{general}')` ;)*
 
 
 ## License

@@ -12,7 +12,7 @@ class ServiceProvider implements ServiceProviderInterface
         $app['serializer.builder'] = function () use ($app) {
             $builder = SerializerBuilder::create()
                 ->setDebug($app['debug'])
-                ->addMetadataDir(__DIR__)
+                ->addMetadataDir(__DIR__, 'Symfony\\Component\\EventDispatcher')
             ;
 
             if ($app->offsetExists('serializer.cache_dir')) {
