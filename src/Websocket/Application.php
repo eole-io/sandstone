@@ -6,14 +6,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
-use Eole\Sandstone\Application as SilexApplication;
+use Eole\Sandstone\Application as SandstoneApplication;
 
 class Application implements WampServerInterface
 {
     /**
-     * @var SilexApplication
+     * @var SandstoneApplication
      */
-    private $silexApp;
+    private $sandstoneApplication;
 
     /**
      * @var Topic[]
@@ -21,11 +21,11 @@ class Application implements WampServerInterface
     private $topics;
 
     /**
-     * @param SilexApplication $silexApp
+     * @param SandstoneApplication $sandstoneApplication
      */
-    public function __construct(SilexApplication $silexApp)
+    public function __construct(SandstoneApplication $sandstoneApplication)
     {
-        $this->silexApp = $silexApp;
+        $this->sandstoneApplication = $sandstoneApplication;
         $this->topics = array();
     }
 
@@ -44,7 +44,7 @@ class Application implements WampServerInterface
             return null;
         }
 
-        $authenticationManager = $this->silexApp['security.authentication_manager'];
+        $authenticationManager = $this->sandstoneApplication['security.authentication_manager'];
 
         $authenticatedToken = $authenticationManager->authenticate(new OAuth2Token($accessToken));
         $user = $authenticatedToken->getUser();
@@ -101,12 +101,12 @@ class Application implements WampServerInterface
      */
     private function loadTopic($topicPath)
     {
-        $topic = $this->silexApp['sandstone.websocket.router']->loadTopic($topicPath);
+        $topic = $this->sandstoneApplication['sandstone.websocket.router']->loadTopic($topicPath);
 
-        $topic->setNormalizer($this->silexApp['serializer']);
+        $topic->setNormalizer($this->sandstoneApplication['serializer']);
 
         if ($topic instanceof EventSubscriberInterface) {
-            $this->silexApp['dispatcher']->addSubscriber($topic);
+            $this->sandstoneApplication['dispatcher']->addSubscriber($topic);
         }
 
         return $topic;

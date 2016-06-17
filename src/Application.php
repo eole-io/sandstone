@@ -52,6 +52,16 @@ class Application extends BaseApplication
     }
 
     /**
+     * Returns whether Push server is registered and enabled.
+     *
+     * @return bool
+     */
+    public function isPushServerEnabled()
+    {
+        return $this->offsetExists('sandstone.push') && $this['sandstone.push.enabled'];
+    }
+
+    /**
      * Automatically forward rest API event to push server.
      *
      * @param string $eventName

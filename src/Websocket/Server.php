@@ -11,15 +11,15 @@ use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
 use Ratchet\Websocket\WsServer;
 use Ratchet\Wamp\ServerProtocol;
-use Eole\Sandstone\Application as SilexApplication;
+use Eole\Sandstone\Application as SandstoneApplication;
 use Eole\Sandstone\Websocket\Application as WebsocketApplication;
 
 class Server
 {
     /**
-     * @var SilexApplication
+     * @var SandstoneApplication
      */
-    private $silexApplication;
+    private $sandstoneApplication;
 
     /**
      * @var LoopInterface
@@ -27,20 +27,12 @@ class Server
     private $loop;
 
     /**
-     * @param SilexApplication $silexApplication
+     * @param SandstoneApplication $sandstoneApplication
      */
-    public function __construct(SilexApplication $silexApplication)
+    public function __construct(SandstoneApplication $sandstoneApplication)
     {
-        $this->silexApplication = $silexApplication;
+        $this->sandstoneApplication = $sandstoneApplication;
         $this->loop = Factory::create();
-
-        echo 'Initialization...'.PHP_EOL;
-
-        $this->initWebsocketServer();
-
-        if ($this->silexApplication['sandstone.push.enabled']) {
-            $this->initPushServer();
-        }
     }
 
     /**
@@ -48,8 +40,8 @@ class Server
      */
     private function initWebsocketServer()
     {
-        $websocketBind = $this->silexApplication['sandstone.websocket.server']['bind'];
-        $websocketPort = $this->silexApplication['sandstone.websocket.server']['port'];
+        $websocketBind = $this->sandstoneApplication['sandstone.websocket.server']['bind'];
+        $websocketPort = $this->sandstoneApplication['sandstone.websocket.server']['port'];
 
         $socket = new ReactSocketServer($this->loop);
         $socket->listen($websocketPort, $websocketBind);
@@ -59,7 +51,7 @@ class Server
                 new WsServer(
                     new ServerProtocol(
                         new WebsocketApplication(
-                            $this->silexApplication
+                            $this->sandstoneApplication
                         )
                     )
                 )
@@ -73,8 +65,8 @@ class Server
      */
     private function initPushServer()
     {
-        $pushBind = $this->silexApplication['sandstone.push.server']['bind'];
-        $pushPort = $this->silexApplication['sandstone.push.server']['port'];
+        $pushBind = $this->sandstoneApplication['sandstone.push.server']['bind'];
+        $pushPort = $this->sandstoneApplication['sandstone.push.server']['port'];
 
         $context = new Context($this->loop);
         $pushServer = $context->getSocket(ZMQ::SOCKET_PULL);
@@ -82,11 +74,11 @@ class Server
         $pushServer->bind("tcp://$pushBind:$pushPort");
 
         $pushServer->on('message', function ($message) {
-            $data = $this->silexApplication['sandstone.push.event_serializer']->deserializeEvent($message);
+            $data = $this->sandstoneApplication['sandstone.push.event_serializer']->deserializeEvent($message);
 
             echo 'PushServer message event: '.$data['name'].PHP_EOL;
 
-            $this->silexApplication['dispatcher']->dispatch($data['name'], $data['event']);
+            $this->sandstoneApplication['dispatcher']->dispatch($data['name'], $data['event']);
         });
     }
 
@@ -95,16 +87,24 @@ class Server
      */
     public function run()
     {
-        $this->silexApplication->boot();
+        echo 'Initialization...'.PHP_EOL;
 
-        $websocketBind = $this->silexApplication['sandstone.websocket.server']['bind'];
-        $websocketPort = $this->silexApplication['sandstone.websocket.server']['port'];
+        $this->initWebsocketServer();
+
+        if ($this->sandstoneApplication->isPushServerEnabled()) {
+            $this->initPushServer();
+        }
+
+        $this->sandstoneApplication->boot();
+
+        $websocketBind = $this->sandstoneApplication['sandstone.websocket.server']['bind'];
+        $websocketPort = $this->sandstoneApplication['sandstone.websocket.server']['port'];
 
         echo "Bind websocket server to $websocketBind:$websocketPort".PHP_EOL;
 
-        if ($this->silexApplication['sandstone.push.enabled']) {
-            $pushBind = $this->silexApplication['sandstone.push.server']['host'];
-            $pushPort = $this->silexApplication['sandstone.push.server']['port'];
+        if ($this->sandstoneApplication->isPushServerEnabled()) {
+            $pushBind = $this->sandstoneApplication['sandstone.push.server']['bind'];
+            $pushPort = $this->sandstoneApplication['sandstone.push.server']['port'];
 
             echo "Bind push server to $pushBind:$pushPort".PHP_EOL;
         }

@@ -14,6 +14,10 @@ class ServiceProvider implements ServiceProviderInterface
      */
     public function register(Container $app)
     {
+        if (!$app->offsetExists('sandstone.push.enabled')) {
+            $app['sandstone.push.enabled'] = true;
+        }
+
         $app['sandstone.push.event_serializer'] = function () use ($app) {
             return new EventSerializer($app['serializer']);
         };
