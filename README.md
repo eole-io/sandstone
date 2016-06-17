@@ -366,6 +366,30 @@ Bind push server to 127.0.0.1:5555
 ```
 
 
+#### Note about Event serialization
+
+As JMS Serializer is used, all class that will be serialized/deserialized
+should have serialization metadata.
+
+You then must provide class metadata, and register them to serializer:
+
+1. Class metadata: See example with [Symfony Event class](src/Serializer/Event.yml), or [JMS Serializer reference](http://jmsyst.com/libs/serializer/master/reference)
+2. Register metadata ([documentation about metadata locations](http://jmsyst.com/libs/serializer/master/configuration#configuring-metadata-locations)):
+
+``` php
+$app['serializer.builder']->addMetadataDir(
+    __DIR__.'/your/metadata/folder',
+    'Your\\Classes\\Namespace'
+);
+```
+
+*Then you should map all your application model class this way.*
+
+> **Note**:
+> Register metadata should be done on your application services stack
+> as it will be used in both rest api stack and websocket server stack.
+
+
 ## References
 
 Sandstone is built on a few other cool PHP libraries you may want to check documentation:
