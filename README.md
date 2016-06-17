@@ -298,14 +298,14 @@ class App extends Eole\Sandstone\Application
 
 Just an example, you want to notify clients in chat channels when a new article is created:
 
-1. **RestApi controller**: dispatch an event on article creation:
+1) **RestApi controller**: dispatch an event on article creation:
 
 ``` php
 // In the RestApi controller (POST /api/articles)
 $app['dispatcher']->dispatch('article.created', new ArticleCreatedEvent($title, $url));
 ```
 
-2. **RestApi stack**: forward event to Push Server
+2) **RestApi stack**: forward event to Push Server
 
 ``` php
 // In the RestApi application stack
@@ -315,7 +315,7 @@ $app->forwardEventToPushServer('article.created');
 *This step is necessary as not ALL events should be forwarded: it may be unwanted in certain cases.
 So this line will automatically forward all future `article.created` events to Push server.*
 
-3. **Websocket topic**: Listen to this event from your Topic
+3) **Websocket topic**: Listen to this event from your Topic
 
 ``` php
 use Eole\Sandstone\Websocket\Topic;
