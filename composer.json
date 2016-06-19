@@ -35,6 +35,19 @@
         "phpunit/phpunit": "4.8.*",
         "squizlabs/php_codesniffer": "2.x"
     },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "ekho/zmq-phpdoc",
+                "version": "1.0",
+                "dist": {
+                    "url": "https://raw.githubusercontent.com/ekho/zmq-phpdoc/master/zmq.php",
+                    "type": "file"
+                }
+            }
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Eole\\Sandstone\\": "src"
