@@ -1,5 +1,10 @@
 # Sandstone
 
+[![Latest Stable Version](https://poser.pugx.org/eole/sandstone/v/stable)](https://packagist.org/packages/eole/sandstone)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/914c7d8f-a51a-4146-b211-44bcf81f5b48/mini.png)](https://insight.sensiolabs.com/projects/914c7d8f-a51a-4146-b211-44bcf81f5b48)
+[![License](https://poser.pugx.org/eole/sandstone/license)](https://packagist.org/packages/eole/sandstone)
+
+
 Sandstone extends Silex to easily mount a RestApi working together with a **Websocket server**.
 Also integrates a **Push server** to send messages from RestApi to websocket server.
 
