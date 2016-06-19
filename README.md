@@ -1,6 +1,7 @@
 # Sandstone
 
 [![Latest Stable Version](https://poser.pugx.org/eole/sandstone/v/stable)](https://packagist.org/packages/eole/sandstone)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/eole-io/sandstone/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/eole-io/sandstone/?branch=master)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/914c7d8f-a51a-4146-b211-44bcf81f5b48/mini.png)](https://insight.sensiolabs.com/projects/914c7d8f-a51a-4146-b211-44bcf81f5b48)
 [![License](https://poser.pugx.org/eole/sandstone/license)](https://packagist.org/packages/eole/sandstone)
 
