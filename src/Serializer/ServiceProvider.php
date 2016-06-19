@@ -15,10 +15,6 @@ class ServiceProvider implements ServiceProviderInterface
                 ->addMetadataDir(__DIR__, 'Symfony\\Component\\EventDispatcher')
             ;
 
-            if ($app->offsetExists('serializer.cache_dir')) {
-                $builder->setCacheDir($app['serializer.cache_dir']);
-            }
-
             return $builder;
         };
 
