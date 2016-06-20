@@ -88,7 +88,7 @@ class Application extends BaseApplication
             ));
         }
 
-        $this->before(function () {
+        $this->before(function () use ($eventName) {
             $this['sandstone.push.event_forwarder']->forwardAllEvents($eventName);
         });
 
@@ -112,7 +112,7 @@ class Application extends BaseApplication
             ));
         }
 
-        $this->before(function () {
+        $this->before(function () use ($eventsNames) {
             $this['sandstone.push.event_forwarder']->forwardAllEvents($eventsNames);
         });
 
