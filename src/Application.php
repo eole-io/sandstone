@@ -80,19 +80,7 @@ class Application extends BaseApplication
      */
     public function forwardEventToPushServer($eventName)
     {
-        if (!$this->offsetExists('sandstone.push')) {
-            throw new \LogicException(sprintf(
-                'You must register Push server service provider (%s) in order to use %s method.',
-                PushServerServiceProvider::class,
-                __METHOD__
-            ));
-        }
-
-        $this->before(function () use ($eventName) {
-            $this['sandstone.push.event_forwarder']->forwardAllEvents($eventName);
-        });
-
-        return $this;
+        return $this->forwardEventsToPushServer([$eventName]);
     }
 
     /**
