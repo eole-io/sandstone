@@ -5,7 +5,6 @@ namespace Eole\Sandstone\OAuth2\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use League\OAuth2\Server\Exception\OAuthException;
 use League\OAuth2\Server\AuthorizationServer;
-use Alcalyn\SerializableApiResponse\ApiResponse;
 
 class OAuth2Controller
 {
@@ -25,21 +24,18 @@ class OAuth2Controller
     /**
      * @param Request $request
      *
-     * @return ApiResponse
+     * @return array like
+     *      access_token:"...",
+     *      token_type:"Bearer"
+     *      expires_in:3600
+     *      refresh_token:"..."
+     *
+     * @throws OAuthException
      */
     public function postAccessToken(Request $request)
     {
         $this->authorizationServer->setRequest($request);
 
-        try {
-            $token = $this->authorizationServer->issueAccessToken();
-
-            return new ApiResponse($token);
-        } catch (OAuthException $e) {
-            return new ApiResponse(array(
-                'type' => $e->errorType,
-                'message' => $e->getMessage(),
-            ), $e->httpStatusCode);
-        }
+        return $this->authorizationServer->issueAccessToken();
     }
 }

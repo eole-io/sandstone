@@ -434,6 +434,9 @@ $app['serializer.builder']->addMetadataDir(
 
 You can **optionally** use Sandstone's OAuth2 for Websocket authentication.
 
+Sandstone provides a simple way to handle OAuth tokens (storing as files),
+and a basic JSON controller to get new access tokens (from password or refresh tokens).
+
 It needs the firewall name and the user provider you use to secure your api,
 an array of OAuth client, an OAuth scope, and a folder to store tokens.
 
@@ -457,7 +460,7 @@ $app->register(new Eole\Sandstone\OAuth2\Silex\OAuth2ServiceProvider(), [
     ],
 ]);
 
-$app->mount('oauth', new Eole\Sandstone\OAuth2\Silex\OAuth2ControllerProvider());
+$app->mount('oauth', new Eole\Sandstone\OAuth2\Silex\OAuth2JsonControllerProvider());
 ```
 
 Then a client can get an access token through the Rest Api (OAuth2 controller), and can use it
