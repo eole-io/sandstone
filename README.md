@@ -9,6 +9,23 @@
 Sandstone extends Silex to easily mount a RestApi working together with a **Websocket server**.
 Also integrates a **Push server** to send messages from RestApi to websocket server.
 
+Declare a websocket topic is like:
+
+``` php
+$app->topic('chat/{channel}', function ($topicPattern, $arguments) {
+    $channelName = $arguments['channel'];
+
+    return new ChatTopic($topicPattern, $channelName);
+})
+->assert('channel', '^[a-zA-Z0-9]+$');
+```
+
+Forward all events from RestApi to websocket server:
+
+``` php
+$app->forwardEventToPushServer('article.created');
+```
+
 
 ## Installation
 
@@ -257,6 +274,23 @@ which becomes highly recommended for scaling bigger applications.*
 Now you have a Rest Api working with a websocket server,
 an interessant part of Sandstone can be aborded.
 
+> **Note**:
+> Using `$app->topic()` is the same as for [Silex routing](http://silex.sensiolabs.org/doc/master/usage.html#routing) (`$app->post()`),
+> so the following example is also relevant:
+
+``` php
+$app
+    ->topic('chat/{channel}', function ($topicPattern) {
+        return new ChatTopic($topicPattern);
+    })
+    ->value('channel', 'general')
+    ->assert('channel', '^[a-zA-Z0-9]+$')
+    ->convert('channel', function () { /* ... */ })
+    ->before(function () { /* ... */ })
+    ->when('chatEnabled()')
+;
+```
+
 
 ### Push server
 
@@ -394,6 +428,42 @@ $app['serializer.builder']->addMetadataDir(
 > **Note**:
 > Register metadata should be done on your application services stack
 > as it will be used in both rest api stack and websocket server stack.
+
+
+### Websocket authentication
+
+You can **optionally** use Sandstone's OAuth2 for Websocket authentication.
+
+It needs the firewall name and the user provider you use to secure your api,
+an array of OAuth client, an OAuth scope, and a folder to store tokens.
+
+Configuration reference:
+
+``` php
+$app->register(new Eole\Sandstone\OAuth2\Silex\OAuth2ServiceProvider(), [
+    'oauth.firewall_name' => 'api',
+    'oauth.security.user_provider' => 'my_app.user_provider',
+    'oauth.tokens_dir' => '/var/oauth-tokens',
+    'oauth.scope' => [
+        'id' => 'your-scope-id',
+        'description' => 'Your scope.',
+    ],
+    'oauth.clients' => [
+        'client-id' => [
+            'id' => 'client-id',
+            'name' => 'client-name',
+            'secret' => 'client-secret',
+        ],
+    ],
+]);
+
+$app->mount('oauth', new Eole\Sandstone\OAuth2\Silex\OAuth2ControllerProvider());
+```
+
+Then a client can get an access token through the Rest Api (OAuth2 controller), and can use it
+for both Api calls and websocket server connections, by passing it as a GET parameter:
+
+`wss://domain.tld:8080/?access_token=accesstoken`
 
 
 ## References

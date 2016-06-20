@@ -30,7 +30,7 @@ class ServiceProvider implements ServiceProviderInterface
         };
 
         $app['sandstone.websocket.router'] = function () use ($app) {
-            return new TopicRouter($app);
+            return new TopicRouter($app['sandstone.websocket.url_matcher']);
         };
     }
 }
