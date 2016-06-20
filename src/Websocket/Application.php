@@ -6,9 +6,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
+use Eole\Sandstone\OAuth2\Security\Authentication\Token\OAuth2Token;
 use Eole\Sandstone\Application as SandstoneApplication;
 
-class Application implements WampServerInterface
+final class Application implements WampServerInterface
 {
     /**
      * @var SandstoneApplication

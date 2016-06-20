@@ -6,6 +6,8 @@ use Alcalyn\AuthorizationHeaderFix\AuthorizationHeaderFixListener;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Silex\Controller;
 use Silex\Application as BaseApplication;
+use Eole\Sandstone\Websocket\ServiceProvider as WebsocketServiceProvider;
+use Eole\Sandstone\PushServer\ServiceProvider as PushServerServiceProvider;
 
 class Application extends BaseApplication
 {
@@ -48,6 +50,14 @@ class Application extends BaseApplication
      */
     public function topic($pattern, callable $factory)
     {
+        if (!$this->offsetExists('sandstone.websocket.topics')) {
+            throw new \LogicException(sprintf(
+                'You must register Websocket server service provider (%s) in order to use %s method.',
+                WebsocketServiceProvider::class,
+                __METHOD__
+            ));
+        }
+
         return $this['sandstone.websocket.topics']->match($pattern, $factory);
     }
 
@@ -70,7 +80,17 @@ class Application extends BaseApplication
      */
     public function forwardEventToPushServer($eventName)
     {
-        $this['sandstone.push.event_forwarder']->forwardAllEvents($eventName);
+        if (!$this->offsetExists('sandstone.push')) {
+            throw new \LogicException(sprintf(
+                'You must register Push server service provider (%s) in order to use %s method.',
+                PushServerServiceProvider::class,
+                __METHOD__
+            ));
+        }
+
+        $this->before(function () use ($eventName) {
+            $this['sandstone.push.event_forwarder']->forwardAllEvents($eventName);
+        });
 
         return $this;
     }
@@ -84,7 +104,17 @@ class Application extends BaseApplication
      */
     public function forwardEventsToPushServer(array $eventsNames)
     {
-        $this['sandstone.push.event_forwarder']->forwardAllEvents($eventsNames);
+        if (!$this->offsetExists('sandstone.push')) {
+            throw new \LogicException(sprintf(
+                'You must register Push server service provider (%s) in order to use %s method.',
+                PushServerServiceProvider::class,
+                __METHOD__
+            ));
+        }
+
+        $this->before(function () use ($eventsNames) {
+            $this['sandstone.push.event_forwarder']->forwardAllEvents($eventsNames);
+        });
 
         return $this;
     }

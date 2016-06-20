@@ -3,22 +3,22 @@
 namespace Eole\Sandstone\Websocket\Routing;
 
 use LogicException;
+use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Eole\Sandstone\Websocket\Topic;
-use Eole\Sandstone\Application;
 
 class TopicRouter
 {
     /**
-     * @var Application
+     * @var UrlMatcher
      */
-    private $sandstoneApplication;
+    private $urlMatcher;
 
     /**
-     * @param Application $sandstoneApplication
+     * @param UrlMatcher $urlMatcher
      */
-    public function __construct(Application $sandstoneApplication)
+    public function __construct(UrlMatcher $urlMatcher)
     {
-        $this->sandstoneApplication = $sandstoneApplication;
+        $this->urlMatcher = $urlMatcher;
     }
 
     /**
@@ -30,9 +30,8 @@ class TopicRouter
      */
     public function loadTopic($topicPath)
     {
-        $urlMatcher = $this->sandstoneApplication['sandstone.websocket.url_matcher'];
-        $arguments = $urlMatcher->match('/'.$topicPath);
-        $topicFactory = $arguments['_topic'];
+        $arguments = $this->urlMatcher->match('/'.$topicPath);
+        $topicFactory = $arguments['_topic_factory'];
 
         if (!is_callable($topicFactory)) {
             throw new LogicException("Topic $topicPath is not a callback.");
