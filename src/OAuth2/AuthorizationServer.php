@@ -2,6 +2,7 @@
 
 namespace Eole\Sandstone\OAuth2;
 
+use League\OAuth2\Server\Storage;
 use League\OAuth2\Server\AuthorizationServer as BaseAuthorizationServer;
 
 class AuthorizationServer extends BaseAuthorizationServer
@@ -17,20 +18,20 @@ class AuthorizationServer extends BaseAuthorizationServer
     private $refreshTokenGrant;
 
     /**
-     * @param Storage\Session $sessionStorage
-     * @param Storage\AccessToken $accessTokenStorage
-     * @param Storage\Client $clientStorage
-     * @param Storage\Scope $scopeStorage
-     * @param Storage\RefreshToken $refreshTokenStorage
+     * @param Storage\SessionInterface $sessionStorage
+     * @param Storage\AccessTokenInterface $accessTokenStorage
+     * @param Storage\ClientInterface $clientStorage
+     * @param Storage\ScopeInterface $scopeStorage
+     * @param Storage\RefreshTokenInterface $refreshTokenStorage
      * @param Grant\Password $passwordGrant
      * @param Grant\RefreshToken $refreshTokenGrant
      */
     public function __construct(
-        Storage\Session $sessionStorage,
-        Storage\AccessToken $accessTokenStorage,
-        Storage\Client $clientStorage,
-        Storage\Scope $scopeStorage,
-        Storage\RefreshToken $refreshTokenStorage,
+        Storage\SessionInterface $sessionStorage,
+        Storage\AccessTokenInterface $accessTokenStorage,
+        Storage\ClientInterface $clientStorage,
+        Storage\ScopeInterface $scopeStorage,
+        Storage\RefreshTokenInterface $refreshTokenStorage,
         Grant\Password $passwordGrant,
         Grant\RefreshToken $refreshTokenGrant
     ) {
