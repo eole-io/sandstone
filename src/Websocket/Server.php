@@ -2,6 +2,7 @@
 
 namespace Eole\Sandstone\Websocket;
 
+use Psr\Log\LoggerAwareTrait;
 use ZMQ;
 use React\ZMQ\Context;
 use React\EventLoop\LoopInterface;
@@ -11,11 +12,14 @@ use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
 use Ratchet\Websocket\WsServer;
 use Ratchet\Wamp\ServerProtocol;
+use Eole\Sandstone\Logger\EchoLogger;
 use Eole\Sandstone\Application as SandstoneApplication;
 use Eole\Sandstone\Websocket\Application as WebsocketApplication;
 
 class Server
 {
+    use LoggerAwareTrait;
+
     /**
      * @var SandstoneApplication
      */
@@ -33,6 +37,8 @@ class Server
     {
         $this->sandstoneApplication = $sandstoneApplication;
         $this->loop = Factory::create();
+
+        $this->setLogger(new EchoLogger());
     }
 
     /**
@@ -76,7 +82,7 @@ class Server
         $pushServer->on('message', function ($message) {
             $data = $this->sandstoneApplication['sandstone.push.event_serializer']->deserializeEvent($message);
 
-            echo 'PushServer message event: '.$data['name'].PHP_EOL;
+            $this->logger->info('Push message event', ['event' => $data['name']]);
 
             $this->sandstoneApplication['dispatcher']->dispatch($data['name'], $data['event']);
         });
@@ -87,7 +93,7 @@ class Server
      */
     public function run()
     {
-        echo 'Initialization...'.PHP_EOL;
+        $this->logger->info('Initialization...');
 
         $this->initWebsocketServer();
 
@@ -97,16 +103,10 @@ class Server
 
         $this->sandstoneApplication->boot();
 
-        $websocketBind = $this->sandstoneApplication['sandstone.websocket.server']['bind'];
-        $websocketPort = $this->sandstoneApplication['sandstone.websocket.server']['port'];
-
-        echo "Bind websocket server to $websocketBind:$websocketPort".PHP_EOL;
+        $this->logger->info('Bind websocket server', $this->sandstoneApplication['sandstone.websocket.server']);
 
         if ($this->sandstoneApplication->isPushServerEnabled()) {
-            $pushBind = $this->sandstoneApplication['sandstone.push.server']['bind'];
-            $pushPort = $this->sandstoneApplication['sandstone.push.server']['port'];
-
-            echo "Bind push server to $pushBind:$pushPort".PHP_EOL;
+            $this->logger->info('Bind push server', $this->sandstoneApplication['sandstone.push.server']);
         }
 
         $this->loop->run();

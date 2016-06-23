@@ -2,15 +2,19 @@
 
 namespace Eole\Sandstone\Websocket;
 
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
+use Eole\Sandstone\Logger\EchoLogger;
 use Eole\Sandstone\OAuth2\Security\Authentication\Token\OAuth2Token;
 use Eole\Sandstone\Application as SandstoneApplication;
 
 final class Application implements WampServerInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * @var SandstoneApplication
      */
@@ -28,6 +32,7 @@ final class Application implements WampServerInterface
     {
         $this->sandstoneApplication = $sandstoneApplication;
         $this->topics = array();
+        $this->logger = new EchoLogger();
     }
 
     /**
@@ -63,17 +68,18 @@ final class Application implements WampServerInterface
      */
     public function onOpen(ConnectionInterface $conn)
     {
-        echo __METHOD__.' authentication... ';
+        $this->logger->info('Connection event', ['event' => 'open']);
+        $this->logger->info('Authentication...');
 
         try {
             $user = $this->authenticateUser($conn);
             if (null === $user) {
-                echo 'Anonymous connection.'.PHP_EOL;
+                $this->logger->info('Anonymous connection');
             } else {
-                echo sprintf('User "%s" logged.'.PHP_EOL, $user->getUsername());
+                $this->logger->info('User logged.', ['username' => $user->getUsername()]);
             }
         } catch (\Exception $e) {
-            echo 'failed: '.$e->getMessage().PHP_EOL;
+            $this->logger->notice('Failed authentication', ['error_message' => $e->getMessage()]);
             $conn->send(json_encode('Could not authenticate client, closing connection.'));
             $conn->close();
 
@@ -118,7 +124,7 @@ final class Application implements WampServerInterface
      */
     public function onSubscribe(ConnectionInterface $conn, $topic)
     {
-        echo __METHOD__.' '.$topic.PHP_EOL;
+        $this->logger->info('Topic event', ['event' => 'subscribe', 'topic' => $topic]);
 
         $this->getTopic($topic)->onSubscribe($conn, $topic);
     }
@@ -128,7 +134,7 @@ final class Application implements WampServerInterface
      */
     public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible)
     {
-        echo __METHOD__.' '.$topic.PHP_EOL;
+        $this->logger->info('Topic event', ['event' => 'publish', 'topic' => $topic]);
 
         $this->topics[$topic]->onPublish($conn, $topic, $event);
     }
@@ -138,7 +144,7 @@ final class Application implements WampServerInterface
      */
     public function onUnSubscribe(ConnectionInterface $conn, $topic)
     {
-        echo __METHOD__.' '.$topic.PHP_EOL;
+        $this->logger->info('Topic event', ['event' => 'unsubscribe', 'topic' => $topic]);
 
         $this->topics[$topic]->onUnSubscribe($conn, $topic);
     }
@@ -148,7 +154,7 @@ final class Application implements WampServerInterface
      */
     public function onClose(ConnectionInterface $conn)
     {
-        echo __METHOD__.PHP_EOL;
+        $this->logger->info('Connection event', ['event' => 'close']);
 
         foreach ($this->topics as $topic) {
             if ($topic->has($conn)) {
@@ -162,7 +168,7 @@ final class Application implements WampServerInterface
      */
     public function onCall(ConnectionInterface $conn, $id, $topic, array $params)
     {
-        echo __METHOD__.PHP_EOL;
+        $this->logger->info('Topic event', ['event' => 'call', 'topic' => $topic]);
     }
 
     /**
@@ -170,6 +176,6 @@ final class Application implements WampServerInterface
      */
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
-        echo __METHOD__.' '.$e->getMessage().PHP_EOL;
+        $this->logger->info('Connection event', ['event' => 'error']);
     }
 }
