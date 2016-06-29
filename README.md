@@ -308,7 +308,7 @@ and redispatch it to your websocket server, so that you just have to listen for 
 
 #### Register Push server and configuration
 
-Register the `Eole\Sandstone\PushServer\ServiceProvider`:
+Register the `Eole\Sandstone\Push\ServiceProvider`:
 
 ``` php
 class App extends Eole\Sandstone\Application
@@ -318,7 +318,7 @@ class App extends Eole\Sandstone\Application
         parent::__construct($values);
 
         // Register Push Server
-        $this->register(new Eole\Sandstone\PushServer\ServiceProvider(), [
+        $this->register(new Eole\Sandstone\Push\ServiceProvider(), [
             'sandstone.push.enabled' => true,
             'sandstone.push.server' => [
                 'bind' => '127.0.0.1',

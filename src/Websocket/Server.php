@@ -97,7 +97,7 @@ class Server
 
         $this->initWebsocketServer();
 
-        if ($this->sandstoneApplication->isPushServerEnabled()) {
+        if ($this->sandstoneApplication->isPushEnabled()) {
             $this->initPushServer();
         }
 
@@ -105,7 +105,7 @@ class Server
 
         $this->logger->info('Bind websocket server', $this->sandstoneApplication['sandstone.websocket.server']);
 
-        if ($this->sandstoneApplication->isPushServerEnabled()) {
+        if ($this->sandstoneApplication->isPushEnabled()) {
             $this->logger->info('Bind push server', $this->sandstoneApplication['sandstone.push.server']);
         }
 

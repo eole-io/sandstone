@@ -1,15 +1,15 @@
 <?php
 
-namespace Eole\Sandstone\PushServer;
+namespace Eole\Sandstone\Push;
 
-use ZMQSocket;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\Event;
+use Eole\Sandstone\Push\PushServerInterface;
 
 class EventForwarder
 {
     /**
-     * @var ZMQSocket
+     * @var PushServerInterface
      */
     private $pushServer;
 
@@ -29,13 +29,13 @@ class EventForwarder
     private $enabled;
 
     /**
-     * @param ZMQSocket $pushServer
+     * @param PushServerInterface $pushServer
      * @param EventDispatcherInterface $dispatcher
      * @param EventSerializer $eventSerializer
      * @param bool $enabled
      */
     public function __construct(
-        ZMQSocket $pushServer,
+        PushServerInterface $pushServer,
         EventDispatcherInterface $dispatcher,
         EventSerializer $eventSerializer,
         $enabled = true
