@@ -12,8 +12,12 @@ class TopicRoute extends Route
      * @param array $defaults
      * @param array $requirements
      */
-    public function __construct($topicPath, callable $topicFactory, array $defaults = array(), array $requirements = array())
-    {
+    public function __construct(
+        $topicPath,
+        callable $topicFactory,
+        array $defaults = array(),
+        array $requirements = array()
+    ) {
         $defaults['_topic_factory'] = $topicFactory;
 
         parent::__construct($topicPath, $defaults, $requirements);
