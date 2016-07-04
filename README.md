@@ -1,5 +1,6 @@
 # Sandstone
 
+[![Build Status](https://travis-ci.org/eole-io/sandstone.svg?branch=dev)](https://travis-ci.org/eole-io/sandstone)
 [![Latest Stable Version](https://poser.pugx.org/eole/sandstone/v/stable)](https://packagist.org/packages/eole/sandstone)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/eole-io/sandstone/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/eole-io/sandstone/?branch=master)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/914c7d8f-a51a-4146-b211-44bcf81f5b48/mini.png)](https://insight.sensiolabs.com/projects/914c7d8f-a51a-4146-b211-44bcf81f5b48)
@@ -308,7 +309,7 @@ and redispatch it to your websocket server, so that you just have to listen for 
 
 #### Register Push server and configuration
 
-Register the `Eole\Sandstone\PushServer\ServiceProvider`:
+Register the `Eole\Sandstone\Push\ServiceProvider`:
 
 ``` php
 class App extends Eole\Sandstone\Application
@@ -318,7 +319,7 @@ class App extends Eole\Sandstone\Application
         parent::__construct($values);
 
         // Register Push Server
-        $this->register(new Eole\Sandstone\PushServer\ServiceProvider(), [
+        $this->register(new Eole\Sandstone\Push\ServiceProvider(), [
             'sandstone.push.enabled' => true,
             'sandstone.push.server' => [
                 'bind' => '127.0.0.1',
@@ -469,6 +470,27 @@ for both Api calls and websocket server connections, by passing it as a GET para
 `wss://domain.tld:8080/?access_token=accesstoken`
 
 
+### Symfony profiler
+
+Sandstone provides a Symfony profiler for Push events.
+
+It logs all transited push message during a single Rest Api call.
+So if your Rest Api route dispatch an event and you forward it to Websocket server,
+you will be able to see all messages content and size in the Symfony debug profiler.
+
+Just enable it:
+
+``` php
+$this->register(new Eole\Sandstone\Push\Debug\PushServerProfilerServiceProvider());
+```
+
+Then a "Push" panel will appear in `/_profiler`.
+
+> **Note**:
+> It assumes you have [installed the Symfony profiler](https://github.com/silexphp/Silex-WebProfiler)
+> in your Silex installation.
+
+
 ## References
 
 Sandstone is built on a few other cool PHP libraries you may want to check documentation:
@@ -480,6 +502,21 @@ Sandstone is built on a few other cool PHP libraries you may want to check docum
 - [JMS Serializer](http://jmsyst.com/libs/serializer) *to ensure serialization/deserialization between Sandstone components and client*
 - [Symfony EventDispatcher](http://symfony.com/doc/current/components/event_dispatcher/introduction.html) *for Push server abstraction `->forwardEventToPushServer()`*
 - [Symfony Routing](http://symfony.com/doc/current/components/routing/introduction.html) *for Topic declaration abstraction `$app->topic('chat{general}')` ;)*
+
+
+## Testing
+
+Running tests:
+
+``` bash
+vendor\bin\phpunit -c .
+```
+
+Checking code style:
+
+``` bash
+vendor\bin\phpcs src --standard=phpcs.xml
+```
 
 
 ## License

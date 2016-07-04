@@ -7,7 +7,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Silex\Controller;
 use Silex\Application as BaseApplication;
 use Eole\Sandstone\Websocket\ServiceProvider as WebsocketServiceProvider;
-use Eole\Sandstone\PushServer\ServiceProvider as PushServerServiceProvider;
+use Eole\Sandstone\Push\ServiceProvider as PushServiceProvider;
 
 class Application extends BaseApplication
 {
@@ -66,7 +66,7 @@ class Application extends BaseApplication
      *
      * @return bool
      */
-    public function isPushServerEnabled()
+    public function isPushEnabled()
     {
         return $this->offsetExists('sandstone.push') && $this['sandstone.push.enabled'];
     }
@@ -94,8 +94,8 @@ class Application extends BaseApplication
     {
         if (!$this->offsetExists('sandstone.push')) {
             throw new \LogicException(sprintf(
-                'You must register Push server service provider (%s) in order to use %s method.',
-                PushServerServiceProvider::class,
+                'You must register a Push server service provider (%s) in order to use %s method.',
+                PushServiceProvider::class,
                 __METHOD__
             ));
         }

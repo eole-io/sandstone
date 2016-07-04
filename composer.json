@@ -53,5 +53,10 @@
         "psr-4": {
             "Eole\\Sandstone\\": "src"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Eole\\Sandstone\\Tests\\": "tests"
+        }
     }
 }

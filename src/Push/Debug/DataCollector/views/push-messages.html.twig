@@ -1,0 +1,71 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    yo
+{% endblock %}
+
+{% block menu %}
+<span class="label{% if 0 == collector.data.messages_count %} disabled{% endif %}">
+    <span class="icon">
+    </span>
+    <strong>Push</strong>
+    {% if collector.data.messages_count > 0 %}
+        <span class="count">
+            <span>{{ collector.data.messages_count }}</span>
+            <span>{{ collector.data.messages_size }} bytes</span>
+        </span>
+    {% endif %}
+</span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Push events</h2>
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ collector.data.messages_count }}</span>
+            <span class="label">Push events</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.data.messages_size }} <span class="unit">bytes</span></span>
+            <span class="label">Total push messages size</span>
+        </div>
+    </div>
+    {% if 0 == collector.data.messages_count %}
+        <div class="empty">
+            <p>No Push events during this request</p>
+        </div>
+    {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Size</th>
+                    <th>Event name</th>
+                    <th>Event class</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for message in collector.data.messages %}
+                    <tr class="no-bottom-border">
+                        <td>{{ loop.index }}</td>
+                        <td>{{ message.size }} bytes</td>
+                        <td>{{ message.decoded.name }}</td>
+                        <td>{{ message.decoded.class }}</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td colspan="3">
+                            <u>Raw message content:</u><br />
+                            {{ message.content }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    <style>
+        .no-bottom-border td {
+            border-bottom-color: rgba(0, 0, 0, 0);
+        }
+    </style>
+{% endblock %}
