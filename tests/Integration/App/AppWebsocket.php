@@ -1,6 +1,6 @@
 <?php
 
-namespace Eole\Sandstone\Tests\Push\App;
+namespace Eole\Sandstone\Tests\Integration\App;
 
 class AppWebsocket extends App
 {

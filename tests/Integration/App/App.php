@@ -1,6 +1,6 @@
 <?php
 
-namespace Eole\Sandstone\Tests\Push\App;
+namespace Eole\Sandstone\Tests\Integration\App;
 
 use Eole\Sandstone\Application;
 
@@ -18,6 +18,11 @@ class App extends Application
                 'port' => '8080',
             ],
         ]);
+
+        $this['serializer.builder']->addMetadataDir(
+            __DIR__,
+            'Eole\\Sandstone\\Tests\\App'
+        );
 
         $this->register(new \Eole\Sandstone\Push\ServiceProvider());
     }
