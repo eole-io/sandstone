@@ -1,5 +1,6 @@
 # Sandstone
 
+[![Build Status](https://travis-ci.org/eole-io/sandstone.svg?branch=dev)](https://travis-ci.org/eole-io/sandstone)
 [![Latest Stable Version](https://poser.pugx.org/eole/sandstone/v/stable)](https://packagist.org/packages/eole/sandstone)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/eole-io/sandstone/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/eole-io/sandstone/?branch=master)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/914c7d8f-a51a-4146-b211-44bcf81f5b48/mini.png)](https://insight.sensiolabs.com/projects/914c7d8f-a51a-4146-b211-44bcf81f5b48)
@@ -480,6 +481,21 @@ Sandstone is built on a few other cool PHP libraries you may want to check docum
 - [JMS Serializer](http://jmsyst.com/libs/serializer) *to ensure serialization/deserialization between Sandstone components and client*
 - [Symfony EventDispatcher](http://symfony.com/doc/current/components/event_dispatcher/introduction.html) *for Push server abstraction `->forwardEventToPushServer()`*
 - [Symfony Routing](http://symfony.com/doc/current/components/routing/introduction.html) *for Topic declaration abstraction `$app->topic('chat{general}')` ;)*
+
+
+## Testing
+
+Running tests:
+
+``` bash
+vendor\bin\phpunit -c .
+```
+
+Checking code style:
+
+``` bash
+vendor\bin\phpcs src --standard=phpcs.xml
+```
 
 
 ## License
