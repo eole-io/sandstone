@@ -1,6 +1,6 @@
 <?php
 
-namespace Eole\Sandstone\PushServer;
+namespace Eole\Sandstone\Push;
 
 use Symfony\Component\EventDispatcher\Event;
 use JMS\Serializer\SerializerInterface;
