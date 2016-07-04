@@ -22,6 +22,7 @@ class TraceablePushServer implements TraceablePushServerInterface
     public function __construct(PushServerInterface $pushServer)
     {
         $this->pushServer = $pushServer;
+        $this->sentMessages = array();
     }
 
     /**

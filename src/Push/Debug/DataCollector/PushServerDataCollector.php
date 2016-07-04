@@ -58,6 +58,7 @@ class PushServerDataCollector extends DataCollector
             $this->data['messages'] []= array(
                 'content' => $message,
                 'size' => $messageSize,
+                'decoded' => unserialize($message),
             );
         }
     }
