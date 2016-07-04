@@ -470,6 +470,27 @@ for both Api calls and websocket server connections, by passing it as a GET para
 `wss://domain.tld:8080/?access_token=accesstoken`
 
 
+### Symfony profiler
+
+Sandstone provides a Symfony profiler for Push events.
+
+It logs all transited push message during a single Rest Api call.
+So if your Rest Api route dispatch an event and you forward it to Websocket server,
+you will be able to see all messages content and size in the Symfony debug profiler.
+
+Just enable it:
+
+``` php
+$this->register(new Eole\Sandstone\Push\Debug\PushServerProfilerServiceProvider());
+```
+
+Then a "Push" panel will appear in `/_profiler`.
+
+> **Note**:
+> It assumes you have [installed the Symfony profiler](https://github.com/silexphp/Silex-WebProfiler)
+> in your Silex installation.
+
+
 ## References
 
 Sandstone is built on a few other cool PHP libraries you may want to check documentation:
