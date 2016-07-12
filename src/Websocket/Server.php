@@ -10,7 +10,7 @@ use React\EventLoop\Factory;
 use React\Socket\Server as ReactSocketServer;
 use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
-use Ratchet\Websocket\WsServer;
+use Ratchet\WebSocket\WsServer;
 use Ratchet\Wamp\ServerProtocol;
 use Eole\Sandstone\Logger\EchoLogger;
 use Eole\Sandstone\Application as SandstoneApplication;
