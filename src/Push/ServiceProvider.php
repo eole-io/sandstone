@@ -4,7 +4,6 @@ namespace Eole\Sandstone\Push;
 
 use Pimple\ServiceProviderInterface;
 use Pimple\Container;
-use Eole\Sandstone\Push\Debug\TraceablePushServer;
 
 class ServiceProvider implements ServiceProviderInterface
 {
