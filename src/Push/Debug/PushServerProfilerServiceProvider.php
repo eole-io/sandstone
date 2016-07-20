@@ -2,6 +2,7 @@
 
 namespace Eole\Sandstone\Push\Debug;
 
+use Twig_Loader_Filesystem;
 use Pimple\ServiceProviderInterface;
 use Pimple\Container;
 use Eole\Sandstone\Push\Debug\DataCollector\PushServerDataCollector;
@@ -30,10 +31,13 @@ class PushServerProfilerServiceProvider implements ServiceProviderInterface
             return $templates;
         });
 
-        $app['twig.loader.filesystem'] = $app->extend('twig.loader.filesystem', function ($loader) {
-            $loader->addPath(__DIR__.'/DataCollector/views');
+        $app['twig.loader.filesystem'] = $app->extend(
+            'twig.loader.filesystem',
+            function (Twig_Loader_Filesystem $loader) {
+                $loader->addPath(__DIR__.'/DataCollector/views');
 
-            return $loader;
-        });
+                return $loader;
+            }
+        );
     }
 }
