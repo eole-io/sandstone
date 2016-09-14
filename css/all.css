@@ -1,0 +1,28 @@
+body {
+    font-size: 16px;
+    padding-top: 62px;
+}
+nav.nav-left a {
+    font-weight: bold;
+    font-size: 14px;
+}
+nav.nav-left a span {
+    font-weight: 300;
+    font-size: 12px;
+}
+.file {
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.08);
+    padding: 6px 16px;
+    font-size: 16px;
+}
+.space-top {
+    margin-top: 32px;
+}
+.no-margin-top {
+    margin-top: 0;
+}
+.btn {
+    font-size: 16px;
+}

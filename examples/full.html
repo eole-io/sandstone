@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Sandstone</title>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://bootswatch.com/sandstone/bootstrap.min.css">
+        <link rel="stylesheet" href="/sandstone/css/prism.css">
+        <link rel="stylesheet" href="/sandstone/css/all.css">
+    </head>
+    <body>
+        <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/sandstone/">Sandstone</a>
+    </div>
+</nav>
+
+
+        <div class="container-fluid space-top">
+    <div class="row">
+        <div class="col-sm-3">
+            <nav class="nav nav-left">
+    <ul class="nav nav-pills nav-stacked">
+        <li><a href="/sandstone/examples/full.html">Full example<br><span>RestApi + Websocket + Push</span></a></li>
+    </ul>
+</nav>
+
+        </div>
+        <div class="col-sm-9">
+            <h2 class="no-margin-top">Use case</h2>
+
+<p>
+    We want a rest api endpoint to post articles,
+    and a multichannel chat where we can talk,
+    and be notified when an article is published.
+</p>
+
+<p>How to do it with Sandstone:</p>
+
+<p>
+    <b>Rest Api stack</b>:
+    A rest api will allow to POST articles
+    by calling <code>POST rest-api.php/api/articles</code>,
+    then the rest api will respond with a http status CREATED.
+    <br />
+
+    <b>Websocket stack</b>:
+    In a same way, a multichannel chat server in mounted
+    by running <code>php websocket-server.php</code>,
+    we can enter and publish message to channels (i.e <code>channel/general</code>).
+    <br />
+
+    <b>Push server</b>:
+    When someone will publish an article using rest api,
+    an event will be sent to websocket server thread using Push server,
+    and this event will be publish to all chat channels
+    to notice chat users that an article has just been published.
+</p>
+
+<h2>Installation</h2>
+
+Create your composer.json:
+
+<p class="file">
+    <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
+    composer.json
+</p>
+
+<pre><code class="language-php">{
+    "require": {
+        "eole/sandstone": "1.1.x"
+    },
+    "autoload": {
+        "psr-4": {
+            "": "src/"
+        }
+    }
+}
+</code></pre>
+
+
+Then run <code>composer update</code>.
+
+<h2>Project structure</h2>
+
+<pre>Silex\Application</pre>
+
+<p class="text-center">
+    <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+</p>
+
+
+<pre>Eole\Sandstone\Application</pre>
+
+<p class="text-center">
+    <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+</p>
+
+
+<p class="file">
+    <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
+    src/MyApp.php
+</p>
+
+<pre><code class="language-php">class MyApp extends Eole\Sandstone\Application
+{
+    public function __construct()
+    {
+        parent::__construct([
+            'debug' => true,
+        ]);
+
+        // Sandstone requires JMS serializer
+        $this->register(new Eole\Sandstone\Serializer\ServiceProvider());
+
+        // Register and configure your websocket server
+        $this->register(new Eole\Sandstone\Websocket\ServiceProvider(), [
+            'sandstone.websocket.server' => [
+                'bind' => '0.0.0.0',
+                'port' => '25569',
+            ],
+        ]);
+
+        // Register Push Server and ZMQ bridge extension
+        $this->register(new \Eole\Sandstone\Push\ServiceProvider());
+        $this->register(new \Eole\Sandstone\Push\Bridge\ZMQ\ServiceProvider(), [
+            'sandstone.push.server' => [
+                'bind' => '127.0.0.1',
+                'host' => '127.0.0.1',
+                'port' => 5555,
+            ],
+        ]);
+
+        // Register serializer metadata
+        $this['serializer.builder']->addMetadataDir(
+            __DIR__,
+            ''
+        );
+    }
+}
+</code></pre>
+
+
+<div class="row">
+    <div class="col-sm-6">
+        <p class="text-center">
+    <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+</p>
+
+
+        <p class="file">
+    <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
+    rest-api.php
+</p>
+
+        <pre><code class="language-php">require_once 'vendor/autoload.php';
+
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+$app = new MyApp();
+
+// Creating an api endpoint at POST api/articles
+$app->post('api/articles', function () use ($app) {
+    // Persisting article...
+    $articleId = 42;
+
+    $event = new ArticleEvent();
+
+    $event->id = $articleId;
+    $event->title = 'Unicorns spotted in Alaska';
+    $event->url = 'http://unicorn.com/articles/unicorns-spotted-alaska';
+
+    // Dispatch an event on article creation
+    $app['dispatcher']->dispatch('article.created', $event);
+
+    return new JsonResponse($articleId, 201);
+});
+
+// Send all 'article.created' events to push server
+$app->forwardEventToPushServer('article.created');
+
+$app->run();
+</code></pre>
+
+    </div>
+    <div class="col-sm-6">
+        <p class="text-center">
+    <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+</p>
+
+
+        <p class="file">
+    <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
+    websocket-server.php
+</p>
+
+        <pre><code class="language-php">require_once 'vendor/autoload.php';
+
+$app = new MyApp();
+
+// Add a route `chat/{channel}` and its Topic factory (works same as mounting API endpoints)
+$app->topic('chat/{channel}', function ($topicPattern) {
+    return new ChatTopic($topicPattern);
+});
+
+// Encapsulate your application and start websocket server
+$websocketServer = new Eole\Sandstone\Websocket\Server($app);
+
+$websocketServer->run();
+</code></pre>
+
+    </div>
+</div>
+
+<h2>Now, let's run the thing</h2>
+
+<div class="row">
+    <div class="col-sm-6">
+        <p>The rest api endpoint will be hit with:</p>
+        <pre>POST rest-api.php/api/articles
+
+HTTP/1.1 201 Created
+Content-Length: 2
+Content-Type: application/json
+
+42
+</pre>
+    </div>
+    <div class="col-sm-6">
+        <p>Run the websocket server and push server with:</p>
+        <pre>php websocket-server.php
+
+# Websocket server is starting
+[info] Initialization... []
+[info] Bind websocket server {"bind":"0.0.0.0","port":"25569"}
+[info] Bind push server {"bind":"127.0.0.1","host":"127.0.0.1","port":5555}
+
+# Someone connects to websocket server
+[info] Connection event {"event":"open"}
+[info] Authentication... []
+[info] Anonymous connection []
+
+# the connected guy subscribes to a chat topic
+[info] Topic event {"event":"subscribe","topic":"chat/general"}
+
+# Websocket server received an event from rest api
+[info] Push message event {"event":"article.created"}
+</pre>
+    </div>
+</div>
+
+<h2>About topic classes</h2>
+
+<p>
+    In this example, we used <code>ChatTopic</code> class.
+</p>
+<p>
+    A topic class must extend <code>Eole\Sandstone\Websocket\Topic</code>,
+    and implement logic to apply when a client <b>subscribes</b>, <b>publishes</b> a message,
+    and <b>unsubscribes</b> from topic (here <code>chat/{channel}</code>).
+</p>
+<p>
+    Another thing, the topic class can also implement <code>Symfony\Component\EventDispatcher\EventSubscriberInterface</code>
+    to automatically listen to events. Usefull when used with <code>forwardEventToPushServer</code>.
+</p>
+<p>
+    See <code>ChatTopic</code> example class:
+</p>
+
+<p class="file">
+    <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
+    src/ChatTopic.php
+</p>
+
+
+<pre><code class="language-php">use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class ChatTopic extends Eole\Sandstone\Websocket\Topic implements EventSubscriberInterface
+{
+    /**
+     * Broadcast message to each subscribing client.
+     *
+     * {@InheritDoc}
+     */
+    public function onPublish(Ratchet\Wamp\WampConnection $conn, $topic, $event)
+    {
+        $this->broadcast([
+            'type' => 'message',
+            'message' => $event,
+        ]);
+    }
+
+    /**
+     * Notify all subscribing clients that a new client has subscribed to this channel.
+     *
+     * {@InheritDoc}
+     */
+    public function onSubscribe(Ratchet\Wamp\WampConnection $conn, $topic)
+    {
+        parent::onSubscribe($conn, $topic);
+
+        $this->broadcast([
+            'type' => 'join',
+            'message' => 'Someone has joined this channel.',
+        ]);
+    }
+
+    /**
+     * Notify all subscribing clients that a new client has unsubscribed from this channel.
+     *
+     * {@InheritDoc}
+     */
+    public function onUnSubscribe(Ratchet\Wamp\WampConnection $conn, $topic)
+    {
+        parent::onUnSubscribe($conn, $topic);
+
+        $this->broadcast([
+            'type' => 'leave',
+            'message' => 'Someone has left this channel.',
+        ]);
+    }
+
+    /**
+     * Subscribe to article.created event.
+     *
+     * {@InheritDoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+            'article.created' => 'onArticleCreated',
+        ];
+    }
+
+    /**
+     * Article created listener.
+     *
+     * @param ArticleEvent $event
+     */
+    public function onArticleCreated(ArticleEvent $event)
+    {
+        $this->broadcast([
+            'type' => 'article_created',
+            'message' => 'An article has just been published: '.$event->title.', read it here: '.$event->url,
+        ]);
+    }
+}
+</code></pre>
+
+
+<h2>About serialization</h2>
+
+<p>
+    When an object is sent to websocket server from rest api stack,
+    or is sent by rest api response to http client,
+    Sandstone uses JMS serializer to serialize it at one side,
+    and deserialize at the other side.
+</p>
+
+<p>
+    In this example, an instance of <code>ArticleEvent</code> is sent to websocket server.
+</p>
+
+<p>
+    So this is how the class and its serializer metadata look like:
+</p>
+
+<div class="row">
+    <div class="col-sm-6">
+        <p class="file">
+    <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
+    src/ArticleEvent.php
+</p>
+
+        <pre><code class="language-php">use Symfony\Component\EventDispatcher\Event;
+
+class ArticleEvent extends Event
+{
+    /**
+     * @var int
+     */
+    public $id;
+
+    /**
+     * @var string
+     */
+    public $title;
+
+    /**
+     * @var string
+     */
+    public $url;
+}
+</code></pre>
+
+    </div>
+    <div class="col-sm-6">
+        <p class="file">
+    <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
+    src/ArticleEvent.yml
+</p>
+
+        <pre><code class="language-yaml">ArticleEvent:
+    exclusion_policy: NONE
+    properties:
+        id:
+            type: integer
+        title:
+            type: string
+        url:
+            type: string
+</code></pre>
+
+
+        <p>
+            That's why we needed to add in <code>MyApp</code>:
+        </p>
+
+        <p class="file">
+    <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
+    src/MyApp.php
+</p>
+
+
+        <figure class="highlight"><pre><code class="language-php" data-lang="php">// Register serializer metadata
+$this['serializer.builder']-&gt;addMetadataDir(
+    __DIR__,
+    ''
+);</code></pre></figure>
+    </div>
+</div>
+
+        </div>
+    </div>
+</div>
+
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="/sandstone/js/prism.js"></script>
+    </body>
+</html>
