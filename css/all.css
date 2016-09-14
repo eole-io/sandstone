@@ -1,6 +1,6 @@
 body {
     font-size: 16px;
-    padding-top: 62px;
+    padding-top: 60px;
 }
 nav.nav-left a {
     font-weight: bold;
@@ -25,4 +25,11 @@ nav.nav-left a span {
 }
 .btn {
     font-size: 16px;
+}
+.jumbotron {
+    background-image: url("../img/triangles-bg.png");
+    background-color: rgb(121, 167, 54);
+    height: 300px;
+    color: white;
+    text-shadow: 0 0 22px rgba(0, 0, 0, 0.75);
 }
