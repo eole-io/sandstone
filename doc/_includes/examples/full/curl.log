@@ -1,0 +1,7 @@
+POST rest-api.php/api/articles
+
+HTTP/1.1 201 Created
+Content-Length: 2
+Content-Type: application/json
+
+42

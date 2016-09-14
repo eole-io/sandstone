@@ -1,0 +1,17 @@
+php websocket-server.php
+
+# Websocket server is starting
+[info] Initialization... []
+[info] Bind websocket server {"bind":"0.0.0.0","port":"25569"}
+[info] Bind push server {"bind":"127.0.0.1","host":"127.0.0.1","port":5555}
+
+# Someone connects to websocket server
+[info] Connection event {"event":"open"}
+[info] Authentication... []
+[info] Anonymous connection []
+
+# the connected guy subscribes to a chat topic
+[info] Topic event {"event":"subscribe","topic":"chat/general"}
+
+# Websocket server received an event from rest api
+[info] Push message event {"event":"article.created"}
