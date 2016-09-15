@@ -10,6 +10,10 @@ nav.nav-left a span {
     font-weight: 300;
     font-size: 12px;
 }
+.navbar .nav > li > a {
+    font-size: 16px;
+    color: white;
+}
 .file {
     border: 1px solid rgba(0, 0, 0, 0.15);
     border-radius: 4px;
