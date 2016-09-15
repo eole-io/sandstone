@@ -37,3 +37,8 @@ nav.nav-left a span {
     color: white;
     text-shadow: 0 0 22px rgba(0, 0, 0, 0.75);
 }
+footer {
+    margin-top: 42px;
+    background-color: #f8f5f0;
+    padding: 24px 0 42px 0;
+}
