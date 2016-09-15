@@ -19,7 +19,7 @@ Sandstone is built on a few other cool PHP libraries you may want to check docum
 
 As you can see, Sandstone uses the first version of WAMP protocol.
 
-This choice has be done because at this time, **server-side**,
+This choice has be done over the v2 because at this time, **server-side**,
 this version is better documented than the v2.
 
 The library Ratchet PHP, which uses wamp v1, is well documented.
@@ -57,7 +57,7 @@ just declare the ones you want to forward with `$app->forwardEventToPushServer('
 
 ### Websocket topics
 
-I wanted to make topic declaration as simple as Silex does with routes.
+I wanted to declare topics as simple as Silex does with routes.
 
 How Silex declares a route:
 

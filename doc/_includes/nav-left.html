@@ -1,7 +1,25 @@
 <nav class="nav nav-left">
     <ul class="nav nav-pills nav-stacked">
-        <li><a href="{{ site.baseurl }}/index.html">Home<br><span>Introduction + Basic usage</span></a></li>
-        <li><a href="{{ site.baseurl }}/examples/full.html">Full example<br><span>RestApi + Websocket + Push</span></a></li>
-        <li><a href="{{ site.baseurl }}/under-the-hood.html">Under the hood<br><span>Used libraries</span></a></li>
+        <li {% include menu-active.html url='/' %}>
+            <a href="{{ site.baseurl }}/">
+                Home
+                <br>
+                <span>Introduction + Basic usage</span>
+            </a>
+        </li>
+        <li {% include menu-active.html url='/examples/full.html' %}>
+            <a href="{{ site.baseurl }}/examples/full.html">
+                Full example
+                <br>
+                <span>RestApi + Websocket + Push</span>
+            </a>
+        </li>
+        <li {% include menu-active.html url='/under-the-hood.html' %}>
+            <a href="{{ site.baseurl }}/under-the-hood.html">
+                Under the hood
+                <br>
+                <span>Used libraries</span>
+            </a>
+        </li>
     </ul>
 </nav>
