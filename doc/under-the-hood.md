@@ -43,13 +43,54 @@ and make controllers dependant to ZMQ.
 <br>
 I used Symfony EventDispatcher to abstract sending messages.
 
-So messages becomes events, then we can dispatch events the usual way from controllers,
-then Sandstone listens these events, serialize them using JMS serializer,
-send them through socket, catch them the other side in the websocket server,
-then re-disptach them using Symfony EventDispatcher.
+So messages becomes events:
+
+- we can dispatch events the usual way from controllers,
+- then Sandstone listens these events,
+- serialize them using JMS serializer,
+- send them through socket,
+- catch them the other side in the websocket server,
+- then re-disptach them using Symfony EventDispatcher.
 
 That way, you can magically listen an event from a websocket topic,
-that is sent from a rest api controller.
+that is sent from a rest api controller:
+
+Rest Api:
+
+``` php
+// rest api controller
+$app['dispatcher']->dispatch('article.created', $event);
+```
+
+``` php
+// rest api stack
+$app->forwardEventToPushServer('article.created');
+```
+
+Websocket server:
+
+``` php
+// websocket topic
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class ChatTopic extends Eole\Sandstone\Websocket\Topic implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents()
+    {
+        return [
+            'article.created' => 'onArticleCreated',
+        ];
+    }
+
+    public function onArticleCreated(ArticleEvent $event)
+    {
+        $this->broadcast([
+            'type' => 'article_created',
+            'message' => 'An article has just been published: '.$event->title.', read it here: '.$event->url,
+        ]);
+    }
+}
+```
 
 Note that Sandstone will not forward *all* events to websocket server,
 just declare the ones you want to forward with `$app->forwardEventToPushServer('my_event')`.
