@@ -2,6 +2,9 @@ body {
     font-size: 16px;
     padding-top: 60px;
 }
+blockquote {
+    font-size: 16px;
+}
 nav.nav-top ul li iframe {
     margin: 16px 16px 0 0;
 }

@@ -2,7 +2,7 @@
 layout: page
 ---
 
-<h2 class="no-margin-top">Under the hood</h2>
+<h1 class="no-margin-top">Under the hood</h1>
 
 Sandstone is built on a few other cool PHP libraries you may want to check documentation:
 
@@ -15,7 +15,7 @@ Sandstone is built on a few other cool PHP libraries you may want to check docum
 - [Symfony Routing](http://symfony.com/doc/current/components/routing/introduction.html) *for Topic declaration abstraction `$app->topic('chat{general}')`*
 
 
-### WAMP protocol v1
+## WAMP protocol v1
 
 As you can see, Sandstone uses the first version of WAMP protocol.
 
@@ -27,7 +27,7 @@ It allows to create topic classes extending `Ratchet\Wamp\Topic`,
 and helps to structure the code.
 
 
-### Push messages abstraction
+## Push messages abstraction
 
 There were a problem to send message from rest api to websocket server,
 which are **two differents thread**.
@@ -96,7 +96,7 @@ Note that Sandstone will not forward *all* events to websocket server,
 just declare the ones you want to forward with `$app->forwardEventToPushServer('my_event')`.
 
 
-### Websocket topics
+## Websocket topics
 
 I wanted to declare topics as simple as Silex does with routes.
 
