@@ -9,29 +9,93 @@
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://bootswatch.com/sandstone/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
         <link rel="stylesheet" href="/sandstone/css/prism.css">
         <link rel="stylesheet" href="/sandstone/css/all.css">
     </head>
     <body>
-        <nav class="navbar navbar-default navbar-fixed-top">
+        <nav class="navbar navbar-default navbar-fixed-top nav-top">
     <div class="container-fluid">
         <a class="navbar-brand" href="/sandstone/">Sandstone</a>
+
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a
+                    href="https://github.com/eole-io/sandstone"
+                    class="github-button"
+                    aria-label="Star eole-io/sandstone on GitHub"
+                    data-count-aria-label="# stargazers on GitHub"
+                    data-count-api="/repos/eole-io/sandstone#stargazers_count"
+                    data-count-href="/eole-io/sandstone/stargazers"
+                    data-style="mega"
+                >Sandstone on Github</a>
+            </li>
+        </ul>
     </div>
 </nav>
 
 
-        <div class="container-fluid space-top">
+        <div class="container space-top">
     <div class="row">
         <div class="col-sm-3">
             <nav class="nav nav-left">
     <ul class="nav nav-pills nav-stacked">
-        <li><a href="/sandstone/examples/full.html">Full example<br><span>RestApi + Websocket + Push</span></a></li>
+        <li 
+>
+            <a href="/sandstone/">
+                <i class="fa fa-home" aria-hidden="true"></i>
+                Home
+                <br>
+                <span>Introduction + Basic usage</span>
+            </a>
+        </li>
+        <li class="active"
+>
+            <a href="/sandstone/examples/full.html">
+                <i class="fa fa-code" aria-hidden="true"></i>
+                Example: Full react server
+                <br>
+                <span>RestApi + Websocket + Push</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/examples/multichannel-chat.html">
+                <i class="fa fa-code" aria-hidden="true"></i>
+                Example: Chat server
+                <br>
+                <span>Websocket</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/under-the-hood.html">
+                <i class="fa fa-cogs" aria-hidden="true"></i>
+                Under the hood
+                <br>
+                <span>Used libraries</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/install-zmq-php-linux.html">
+                <i class="fa fa-archive" aria-hidden="true"></i>
+                ZMQ Linux installation
+                <br>
+                <span>and php binding</span>
+            </a>
+        </li>
     </ul>
 </nav>
 
         </div>
         <div class="col-sm-9">
-            <h2 class="no-margin-top">Use case</h2>
+            <h1 class="no-margin-top">Full example</h1>
+
+<p>Example of a fully working rest api working together with a websocket server.</p>
+
+
+<h2 class="no-margin-top">Use case</h2>
 
 <p>
     We want a rest api endpoint to post articles,
@@ -70,7 +134,7 @@ Create your composer.json:
     composer.json
 </p>
 
-<pre><code class="language-php">{
+<pre><code class="language-json">{
     "require": {
         "eole/sandstone": "1.1.x"
     },
@@ -147,10 +211,12 @@ Then run <code>composer update</code>.
 
 <div class="row">
     <div class="col-sm-6">
-        <p class="text-center">
+        <div class="hidden-xs">
+            <p class="text-center">
     <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
 </p>
 
+        </div>
 
         <p class="file">
     <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
@@ -188,10 +254,12 @@ $app->run();
 
     </div>
     <div class="col-sm-6">
-        <p class="text-center">
+        <div class="hidden-xs">
+            <p class="text-center">
     <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
 </p>
 
+        </div>
 
         <p class="file">
     <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
@@ -439,6 +507,26 @@ $this['serializer.builder']-&gt;addMetadataDir(
 </div>
 
 
+        <footer>
+    <div class="container-fluid">
+        <div class="text-center">
+            <p>Sandstone is under <a href="https://github.com/eole-io/sandstone/blob/master/LICENSE">MIT license</a>.</p>
+            <br />
+            <a
+                href="https://github.com/alcalyn"
+                class="github-button"
+                aria-label="Follow @alcalyn on GitHub"
+                data-count-aria-label="# followers on GitHub"
+                data-count-api="/users/alcalyn#followers"
+                data-count-href="/alcalyn/followers"
+                data-style="mega"
+            >Follow @alcalyn</a>
+        </div>
+    </div>
+</footer>
+
+
+        <script async defer src="https://buttons.github.io/buttons.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
         <script src="/sandstone/js/prism.js"></script>

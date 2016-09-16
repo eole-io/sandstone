@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Sandstone</title>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://bootswatch.com/sandstone/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/sandstone/css/prism.css">
+        <link rel="stylesheet" href="/sandstone/css/all.css">
+    </head>
+    <body>
+        <nav class="navbar navbar-default navbar-fixed-top nav-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/sandstone/">Sandstone</a>
+
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a
+                    href="https://github.com/eole-io/sandstone"
+                    class="github-button"
+                    aria-label="Star eole-io/sandstone on GitHub"
+                    data-count-aria-label="# stargazers on GitHub"
+                    data-count-api="/repos/eole-io/sandstone#stargazers_count"
+                    data-count-href="/eole-io/sandstone/stargazers"
+                    data-style="mega"
+                >Sandstone on Github</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
+        <div class="container space-top">
+    <div class="row">
+        <div class="col-sm-3">
+            <nav class="nav nav-left">
+    <ul class="nav nav-pills nav-stacked">
+        <li 
+>
+            <a href="/sandstone/">
+                <i class="fa fa-home" aria-hidden="true"></i>
+                Home
+                <br>
+                <span>Introduction + Basic usage</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/examples/full.html">
+                <i class="fa fa-code" aria-hidden="true"></i>
+                Example: Full react server
+                <br>
+                <span>RestApi + Websocket + Push</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/examples/multichannel-chat.html">
+                <i class="fa fa-code" aria-hidden="true"></i>
+                Example: Chat server
+                <br>
+                <span>Websocket</span>
+            </a>
+        </li>
+        <li class="active"
+>
+            <a href="/sandstone/under-the-hood.html">
+                <i class="fa fa-cogs" aria-hidden="true"></i>
+                Under the hood
+                <br>
+                <span>Used libraries</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/install-zmq-php-linux.html">
+                <i class="fa fa-archive" aria-hidden="true"></i>
+                ZMQ Linux installation
+                <br>
+                <span>and php binding</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+        </div>
+        <div class="col-sm-9">
+            <h1 class="no-margin-top">Under the hood</h1>
+
+<p>Sandstone is built on a few other cool PHP libraries you may want to check documentation:</p>
+
+<ul>
+  <li><a href="http://silex.sensiolabs.org/">Silex 2</a> <em>for RestApi and application container (<a href="http://pimple.sensiolabs.org/">Pimple</a>)</em></li>
+  <li><a href="http://socketo.me/">Ratchet PHP</a> <em>for websockets</em></li>
+  <li><a href="http://zeromq.org/">ZeroMQ</a> <em>for Push server</em></li>
+  <li><a href="http://wamp-proto.org/">WAMP protocol</a> (<strong>v1</strong>) <em>for topics pub/sub</em></li>
+  <li><a href="http://jmsyst.com/libs/serializer">JMS Serializer</a> <em>to ensure serialization/deserialization between Sandstone components and client</em></li>
+  <li><a href="http://symfony.com/doc/current/components/event_dispatcher/introduction.html">Symfony EventDispatcher</a> <em>for Push server abstraction <code class="highlighter-rouge">-&gt;forwardEventToPushServer()</code></em></li>
+  <li><a href="http://symfony.com/doc/current/components/routing/introduction.html">Symfony Routing</a> <em>for Topic declaration abstraction <code class="highlighter-rouge">$app-&gt;topic('chat{general}')</code></em></li>
+</ul>
+
+<h2 id="wamp-protocol-v1">WAMP protocol v1</h2>
+
+<p>As you can see, Sandstone uses the first version of WAMP protocol.</p>
+
+<p>This choice has be done over the v2 because at this time, <strong>server-side</strong>,
+this version is better documented than the v2.</p>
+
+<p>The library Ratchet PHP, which uses wamp v1, is well documented.
+It allows to create topic classes extending <code class="highlighter-rouge">Ratchet\Wamp\Topic</code>,
+and helps to structure the code.</p>
+
+<h2 id="push-messages-abstraction">Push messages abstraction</h2>
+
+<p>There were a problem to send message from rest api to websocket server,
+which are <strong>two differents thread</strong>.</p>
+
+<p>To resolve this problem, I needed to use tcp sockets:
+the websocket server opens and listen to a socket,
+while the rest api send tcp messages to the socket.</p>
+
+<p>First, I used ZMQ to abstract socket creation and listen with PHP.</p>
+
+<p>But I don’t want to use ZMQ directly in rest api controller to send messages,
+and make controllers dependant to ZMQ.
+<br />
+I used Symfony EventDispatcher to abstract sending messages.</p>
+
+<p>So messages becomes events:</p>
+
+<ul>
+  <li>we can dispatch events the usual way from controllers,</li>
+  <li>then Sandstone listens these events,</li>
+  <li>serialize them using JMS serializer,</li>
+  <li>send them through socket,</li>
+  <li>catch them the other side in the websocket server,</li>
+  <li>then re-disptach them using Symfony EventDispatcher.</li>
+</ul>
+
+<p>That way, you can magically listen an event from a websocket topic,
+that is sent from a rest api controller:</p>
+
+<p>Rest Api:</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>// rest api controller
+$app['dispatcher']-&gt;dispatch('article.created', $event);
+</code></pre>
+</div>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>// rest api stack
+$app-&gt;forwardEventToPushServer('article.created');
+</code></pre>
+</div>
+
+<p>Websocket server:</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>// websocket topic
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class ChatTopic extends Eole\Sandstone\Websocket\Topic implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents()
+    {
+        return [
+            'article.created' =&gt; 'onArticleCreated',
+        ];
+    }
+
+    public function onArticleCreated(ArticleEvent $event)
+    {
+        $this-&gt;broadcast([
+            'type' =&gt; 'article_created',
+            'message' =&gt; 'An article has just been published: '.$event-&gt;title.', read it here: '.$event-&gt;url,
+        ]);
+    }
+}
+</code></pre>
+</div>
+
+<p>Note that Sandstone will not forward <em>all</em> events to websocket server,
+just declare the ones you want to forward with <code class="highlighter-rouge">$app-&gt;forwardEventToPushServer('my_event')</code>.</p>
+
+<h2 id="websocket-topics">Websocket topics</h2>
+
+<p>I wanted to declare topics as simple as Silex does with routes.</p>
+
+<p>How Silex declares a route:</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>$app = new Silex\Application();
+
+// Or using Sandstone:
+$app = new Eole\Sandstone\Application();
+
+$app-&gt;get('/hello/{name}', function ($name) use ($app) {
+    return 'Hello '.$app-&gt;escape($name);
+});
+</code></pre>
+</div>
+
+<p>How Sandstone declares a websocket topic:</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>$app = new Eole\Sandstone\Application();
+
+$app-&gt;topic('chat/{channel}', function ($topicPattern, $arguments) {
+    return new ChatTopic($topicPattern);
+});
+</code></pre>
+</div>
+
+<p>And you can also use constraints like:</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>$app
+    -&gt;topic('chat/{channel}', function ($topicPattern, $arguments) {
+        return new ChatTopic($topicPattern);
+    })
+    -&gt;value('channel', 'general')                   // Put a default value
+    -&gt;assert('channel', '^[a-zA-Z0-9]+$')           // Accept only characters for channel name
+    -&gt;convert('channel', function () { /* ... */ })
+    -&gt;before(function () { /* ... */ })
+    -&gt;when('chatEnabled()')
+;
+</code></pre>
+</div>
+
+<p>Then you get as arguments:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$topicPattern =&gt; 'chat/general', or 'chat/wtf-you-put-here'
+$arguments =&gt; ['channel' =&gt; 'general']
+</code></pre>
+</div>
+
+
+        </div>
+    </div>
+</div>
+
+
+        <footer>
+    <div class="container-fluid">
+        <div class="text-center">
+            <p>Sandstone is under <a href="https://github.com/eole-io/sandstone/blob/master/LICENSE">MIT license</a>.</p>
+            <br />
+            <a
+                href="https://github.com/alcalyn"
+                class="github-button"
+                aria-label="Follow @alcalyn on GitHub"
+                data-count-aria-label="# followers on GitHub"
+                data-count-api="/users/alcalyn#followers"
+                data-count-href="/alcalyn/followers"
+                data-style="mega"
+            >Follow @alcalyn</a>
+        </div>
+    </div>
+</footer>
+
+
+        <script async defer src="https://buttons.github.io/buttons.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="/sandstone/js/prism.js"></script>
+    </body>
+</html>

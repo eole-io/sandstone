@@ -35,20 +35,12 @@
 </nav>
 
 
-        <div class="jumbotron">
-    <div class="container">
-        <h1>Sandstone</h1>
-        <p>Extends Silex PHP to easily mount a Websocket server working together with a RestApi.</p>
-        <a href="/sandstone/examples/full.html" class="btn btn-lg btn-primary">Get started</a>
-    </div>
-</div>
-
-<div class="container space-top">
+        <div class="container space-top">
     <div class="row">
         <div class="col-sm-3">
             <nav class="nav nav-left">
     <ul class="nav nav-pills nav-stacked">
-        <li class="active"
+        <li 
 >
             <a href="/sandstone/">
                 <i class="fa fa-home" aria-hidden="true"></i>
@@ -84,7 +76,7 @@
                 <span>Used libraries</span>
             </a>
         </li>
-        <li 
+        <li class="active"
 >
             <a href="/sandstone/install-zmq-php-linux.html">
                 <i class="fa fa-archive" aria-hidden="true"></i>
@@ -98,79 +90,87 @@
 
         </div>
         <div class="col-sm-9">
-            <h2 class="no-margin-top">Introduction</h2>
+            <h1 class="no-margin-top">Install ZMQ and php-zmq extension</h1>
 
-<p>If you want to build a PHP application with real-time stuff,
-this library can help you to use websockets in a structured application.</p>
+<p>This documentation has been strongly inspired from
+<a href="http://alexandervn.nl/2012/05/03/install-zeromq-php-ubuntu/">http://alexandervn.nl/2012/05/03/install-zeromq-php-ubuntu/</a>
+(May 2012)
+which installs ZeroMQ 2 on Ubuntu 11.10 and php 5.3.</p>
 
-<p>What you can achieve with Sandstone:</p>
+<p>This tuto installs a ZeroMQ 4 on a Raspberry Pi 3 with minimal Debian Jessie, php7.</p>
 
-<ul>
-  <li>Create a Rest Api using Silex (Sandstone extends Silex)</li>
-  <li>Create a websocket topic the same way as creating an api endpoint</li>
-  <li>Dispatch event from Rest Api to Websocket server using Symfony event dispatcher</li>
-</ul>
+<h2 id="requirements">Requirements</h2>
 
-<h2 id="installation">Installation</h2>
+<p>Make sure you have all the packages:</p>
 
-<p>Sandstone needs:</p>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>sudo apt-get install build-essential libtool autoconf uuid-dev pkg-config git libsodium
 
-<ul>
-  <li>PHP &gt;= 5.5</li>
-  <li>ZMQ and ZMQ php extension (or see <a href="/sandstone/install-zmq-php-linux.html">Install ZMQ and php-zmq on Linux</a>)</li>
-</ul>
-
-<p>Sandstone is on composer (<a href="https://packagist.org/packages/eole/sandstone">eole/sandstone</a>).
-Using composer:</p>
-
-<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
-    </span><span class="nt">"require"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-        </span><span class="nt">"eole/sandstone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.x"</span><span class="w">
-    </span><span class="p">}</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre>
-</div>
-
-<p>Then run <code class="highlighter-rouge">composer update</code>.</p>
-
-<h2 id="usage">Usage</h2>
-
-<p>Creating a multichannel chat server:</p>
-
-<div class="language-php highlighter-rouge"><pre class="highlight"><code>// chat-server.php
-
-require_once 'vendor/autoload.php';
-
-$app = new Eole\Sandstone\Application();
-
-$app-&gt;topic('chat/{channel}', function ($topicPattern, $arguments) {
-    $channelName = $arguments['channel'];
-
-    return new ChatTopic($topicPattern, $channelName);
-})
--&gt;assert('channel', '^[a-zA-Z0-9]+$');
-
-$websocketServer = new Eole\Sandstone\Websocket\Server($app);
-
-$websocketServer-&gt;run();
+<span class="c">## and PHP depending on your version, one of these set of packages:</span>
+sudo apt-get install php7.0 php7.0-dev
+sudo apt-get install php5 php5-dev
+sudo apt-get install php php-dev
 </code></pre>
 </div>
 
-<p>Then run chat server with <code class="highlighter-rouge">php chat-server.php</code>.</p>
+<blockquote>
+  <p><strong>Note for Ubuntu</strong>:
+<code class="highlighter-rouge">libsodium</code> has another package name on ubuntu, it is <code class="highlighter-rouge">libsodium-dev</code>.</p>
 
-<p>But Sandstone is not only a framework to use websockets.
-It is meant to create a rest api working together with websocket server.</p>
+  <p>Go to <a href="https://github.com/jonathanpmartins">Jonathan Prass Martins</a>’s gist to see how to install it:</p>
 
-<p>See what you can do with examples:</p>
+  <p><a href="https://gist.github.com/jonathanpmartins/2510f38abee1e65c6d92">https://gist.github.com/jonathanpmartins/2510f38abee1e65c6d92</a></p>
+</blockquote>
+
+<h2 id="install-zeromq">Install ZeroMQ</h2>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>wget https://archive.org/download/zeromq_4.1.4/zeromq-4.1.4.tar.gz <span class="c"># Latest tarball on 07/08/2016</span>
+tar -xvzf zeromq-4.1.4.tar.gz
+<span class="nb">cd </span>zeromq-4.1.4
+./configure
+make
+sudo make install
+sudo ldconfig
+</code></pre>
+</div>
+
+<blockquote>
+  <p><strong>Note</strong>:
+Check the lastest tarball release here:
+<a href="http://download.zeromq.org/#ZeroMQ_4">http://download.zeromq.org/#ZeroMQ_4</a></p>
+</blockquote>
+
+<h2 id="installing-the-php-binding">Installing the PHP binding</h2>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>git clone git://github.com/mkoppanen/php-zmq.git
+<span class="nb">cd </span>php-zmq
+phpize <span class="o">&amp;&amp;</span> ./configure
+make
+sudo make install
+</code></pre>
+</div>
+
+<p>Then add <code class="highlighter-rouge">extension=zmq.so</code> in either:</p>
 
 <ul>
-  <li><a href="/sandstone/examples/full.html">Full example of a rest api working with a websocket server</a></li>
-  <li><a href="/sandstone/examples/multichannel-chat.html">Multichannel chat server</a></li>
+  <li>your php.ini files (apache2 and cli ones)</li>
+  <li>or in file <code class="highlighter-rouge">/etc/php/7.0/mods-available/zmq.ini</code>, then run <code class="highlighter-rouge">sudo phpenmod zmq</code></li>
 </ul>
 
-<h2 id="license">License</h2>
+<p>Do a <code class="highlighter-rouge">sudo service apache2 restart</code></p>
 
-<p>Sandstone is under <a href="https://github.com/eole-io/sandstone/blob/master/LICENSE">MIT license</a>.</p>
+<h2 id="check-that-its-well-installed">Check that it’s well installed</h2>
+
+<p>Just create a php file in your <code class="highlighter-rouge">www/</code> folder and add this:</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+
+<span class="nb">var_dump</span><span class="p">(</span><span class="nb">class_exists</span><span class="p">(</span><span class="s1">'ZMQContext'</span><span class="p">));</span>
+</code></pre>
+</div>
+
+<p>And run the file with <code class="highlighter-rouge">php my-file.php</code>, and from your browser, you should see <code class="highlighter-rouge">bool(true)</code>.</p>
+
+<p>You can also check the installed ZMQ version from phpinfo.</p>
 
         </div>
     </div>
