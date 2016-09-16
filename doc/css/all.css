@@ -1,0 +1,53 @@
+body {
+    font-size: 16px;
+    padding-top: 60px;
+}
+blockquote {
+    font-size: 16px;
+}
+nav.nav-top ul li iframe {
+    margin: 16px 16px 0 0;
+}
+nav.nav-left {
+    margin-bottom: 24px;
+}
+nav.nav-left a {
+    font-weight: bold;
+    font-size: 14px;
+}
+nav.nav-left a span {
+    font-weight: 300;
+    font-size: 12px;
+}
+.navbar .nav > li > a {
+    font-size: 16px;
+    color: white;
+}
+.file {
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.08);
+    padding: 6px 16px;
+    font-size: 16px;
+}
+.space-top {
+    margin-top: 32px;
+}
+.no-margin-top {
+    margin-top: 0;
+}
+.btn {
+    font-size: 16px;
+}
+.jumbotron {
+    background-image: url("../img/triangles-bg.png");
+    background-color: rgb(121, 167, 54);
+    height: 300px;
+    color: white;
+    text-shadow: 0 0 22px rgba(0, 0, 0, 0.75);
+}
+footer {
+    margin-top: 42px;
+    background-color: #f8f5f0;
+    padding: 24px 0 42px 0;
+}

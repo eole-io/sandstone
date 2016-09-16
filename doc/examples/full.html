@@ -1,0 +1,156 @@
+---
+layout: page
+---
+
+<h1 class="no-margin-top">Full example</h1>
+
+<p>Example of a fully working rest api working together with a websocket server.</p>
+
+
+<h2 class="no-margin-top">Use case</h2>
+
+<p>
+    We want a rest api endpoint to post articles,
+    and a multichannel chat where we can talk,
+    and be notified when an article is published.
+</p>
+
+<p>How to do it with Sandstone:</p>
+
+<p>
+    <b>Rest Api stack</b>:
+    A rest api will allow to POST articles
+    by calling <code>POST rest-api.php/api/articles</code>,
+    then the rest api will respond with a http status CREATED.
+    <br />
+
+    <b>Websocket stack</b>:
+    In a same way, a multichannel chat server in mounted
+    by running <code>php websocket-server.php</code>,
+    we can enter and publish message to channels (i.e <code>channel/general</code>).
+    <br />
+
+    <b>Push server</b>:
+    When someone will publish an article using rest api,
+    an event will be sent to websocket server thread using Push server,
+    and this event will be publish to all chat channels
+    to notice chat users that an article has just been published.
+</p>
+
+<h2>Installation</h2>
+
+Create your composer.json:
+
+{% include file-title.html filename="composer.json" %}
+{% include highlight-file.html filename="examples/full/composer.json" code="json" %}
+
+Then run <code>composer update</code>.
+
+<h2>Project structure</h2>
+
+<pre>Silex\Application</pre>
+
+{% include arrow-up.html %}
+
+<pre>Eole\Sandstone\Application</pre>
+
+{% include arrow-up.html %}
+
+{% include file-title.html filename="src/MyApp.php" %}
+{% include highlight-file.html filename="examples/full/src/MyApp.php" code="php" %}
+
+<div class="row">
+    <div class="col-sm-6">
+        <div class="hidden-xs">
+            {% include arrow-up.html %}
+        </div>
+
+        {% include file-title.html filename="rest-api.php" %}
+        {% include highlight-file.html filename="examples/full/rest-api.php" code="php" %}
+    </div>
+    <div class="col-sm-6">
+        <div class="hidden-xs">
+            {% include arrow-up.html %}
+        </div>
+
+        {% include file-title.html filename="websocket-server.php" %}
+        {% include highlight-file.html filename="examples/full/websocket-server.php" code="php" %}
+    </div>
+</div>
+
+<h2>Now, let's run the thing</h2>
+
+<div class="row">
+    <div class="col-sm-6">
+        <p>The rest api endpoint will be hit with:</p>
+        <pre>{% include examples/full/curl.log %}</pre>
+    </div>
+    <div class="col-sm-6">
+        <p>Run the websocket server and push server with:</p>
+        <pre>{% include examples/full/websocket-server.log %}</pre>
+    </div>
+</div>
+
+<h2>About topic classes</h2>
+
+<p>
+    In this example, we used <code>ChatTopic</code> class.
+</p>
+<p>
+    A topic class must extend <code>Eole\Sandstone\Websocket\Topic</code>,
+    and implement logic to apply when a client <b>subscribes</b>, <b>publishes</b> a message,
+    and <b>unsubscribes</b> from topic (here <code>chat/{channel}</code>).
+</p>
+<p>
+    Another thing, the topic class can also implement <code>Symfony\Component\EventDispatcher\EventSubscriberInterface</code>
+    to automatically listen to events. Usefull when used with <code>forwardEventToPushServer</code>.
+</p>
+<p>
+    See <code>ChatTopic</code> example class:
+</p>
+
+{% include file-title.html filename="src/ChatTopic.php" %}
+
+{% include highlight-file.html filename="examples/full/src/ChatTopic.php" code="php" %}
+
+<h2>About serialization</h2>
+
+<p>
+    When an object is sent to websocket server from rest api stack,
+    or is sent by rest api response to http client,
+    Sandstone uses JMS serializer to serialize it at one side,
+    and deserialize at the other side.
+</p>
+
+<p>
+    In this example, an instance of <code>ArticleEvent</code> is sent to websocket server.
+</p>
+
+<p>
+    So this is how the class and its serializer metadata look like:
+</p>
+
+<div class="row">
+    <div class="col-sm-6">
+        {% include file-title.html filename="src/ArticleEvent.php" %}
+        {% include highlight-file.html filename="examples/full/src/ArticleEvent.php" code="php" %}
+    </div>
+    <div class="col-sm-6">
+        {% include file-title.html filename="src/ArticleEvent.yml" %}
+        {% include highlight-file.html filename="examples/full/src/ArticleEvent.yml" code="yaml" %}
+
+        <p>
+            That's why we needed to add in <code>MyApp</code>:
+        </p>
+
+        {% include file-title.html filename="src/MyApp.php" %}
+
+        {% highlight php %}
+// Register serializer metadata
+$this['serializer.builder']->addMetadataDir(
+    __DIR__,
+    ''
+);
+{% endhighlight %}
+    </div>
+</div>
