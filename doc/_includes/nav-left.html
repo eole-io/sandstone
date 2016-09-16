@@ -1,0 +1,44 @@
+<nav class="nav nav-left">
+    <ul class="nav nav-pills nav-stacked">
+        <li {% include menu-active.html url='/' %}>
+            <a href="{{ site.baseurl }}/">
+                <i class="fa fa-home" aria-hidden="true"></i>
+                Home
+                <br>
+                <span>Introduction + Basic usage</span>
+            </a>
+        </li>
+        <li {% include menu-active.html url='/examples/full.html' %}>
+            <a href="{{ site.baseurl }}/examples/full.html">
+                <i class="fa fa-code" aria-hidden="true"></i>
+                Example: Full react server
+                <br>
+                <span>RestApi + Websocket + Push</span>
+            </a>
+        </li>
+        <li {% include menu-active.html url='/examples/multichannel-chat.html' %}>
+            <a href="{{ site.baseurl }}/examples/multichannel-chat.html">
+                <i class="fa fa-code" aria-hidden="true"></i>
+                Example: Chat server
+                <br>
+                <span>Websocket</span>
+            </a>
+        </li>
+        <li {% include menu-active.html url='/under-the-hood.html' %}>
+            <a href="{{ site.baseurl }}/under-the-hood.html">
+                <i class="fa fa-cogs" aria-hidden="true"></i>
+                Under the hood
+                <br>
+                <span>Used libraries</span>
+            </a>
+        </li>
+        <li {% include menu-active.html url='/install-zmq-php-linux.html' %}>
+            <a href="{{ site.baseurl }}/install-zmq-php-linux.html">
+                <i class="fa fa-archive" aria-hidden="true"></i>
+                ZMQ Linux installation
+                <br>
+                <span>and php binding</span>
+            </a>
+        </li>
+    </ul>
+</nav>

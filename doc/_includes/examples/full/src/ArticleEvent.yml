@@ -1,0 +1,9 @@
+ArticleEvent:
+    exclusion_policy: NONE
+    properties:
+        id:
+            type: integer
+        title:
+            type: string
+        url:
+            type: string

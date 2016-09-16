@@ -1,0 +1,36 @@
+<html>
+    <body>
+        <script src="http://autobahn.s3.amazonaws.com/js/autobahn.min.js"></script>
+        <script>
+
+            /**
+             * Called when connected to chat server.
+             *
+             * @param {wampSession} session Object provided by autobahn to subscribe/publish/unsubscribe.
+             */
+            function onSessionOpen(session) {
+                // Subscribe to 'chat/general' topic
+                session.subscribe('chat/general', function (topic, event) {
+                    console.log('message received', topic, event);
+                });
+
+                // Publish a message to 'chat/general' topic
+                session.publish('chat/general', 'Hello friend !');
+            }
+
+            /**
+             * Called on error.
+             *
+             * @param {Integer} code
+             * @param {String} reason
+             * @param {String} detail
+             */
+            function onError(code, reason, detail) {
+                console.warn('error', code, reason, detail);
+            }
+
+            // Connect to chat server
+            ab.connect('ws://localhost:25569', onSessionOpen, onError);
+        </script>
+    </body>
+</html>
