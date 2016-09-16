@@ -63,7 +63,10 @@ Then run chat server with `php chat-server.php`.
 But Sandstone is not only a framework to use websockets.
 It is meant to create a rest api working together with websocket server.
 
-See the <a href="{{ site.baseurl }}/examples/full.html">full example of Sandstone</a>.
+See what you can do with examples:
+
+- [Full example of a rest api working with a websocket server]({{ site.baseurl }}/examples/full.html)
+- [Multichannel chat server]({{ site.baseurl }}/examples/multichannel-chat.html)
 
 
 ## License

@@ -7,7 +7,7 @@ layout: page
 This documentation has been strongly inspired from
 [http://alexandervn.nl/2012/05/03/install-zeromq-php-ubuntu/](http://alexandervn.nl/2012/05/03/install-zeromq-php-ubuntu/)
 (May 2012)
-which installs it on Ubuntu 11.10 and php 5.3.
+which installs ZeroMQ 2 on Ubuntu 11.10 and php 5.3.
 
 This tuto installs a ZeroMQ 4 on a Raspberry Pi 3 with minimal Debian Jessie, php7.
 
