@@ -108,7 +108,7 @@ Following the documentation, we can use our chat with:
 
 {% include file-title.html filename="front-end.html" %}
 ``` html
-{% include examples/multichannel-chat/front-end.html code="js" %}
+{% include examples/multichannel-chat/front-end.html %}
 ```
 
 Then, run your chat server:

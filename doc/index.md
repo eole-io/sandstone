@@ -1,5 +1,5 @@
 ---
-layout: home
+layout: page
 ---
 
 <h2 class="no-margin-top">Introduction</h2>
