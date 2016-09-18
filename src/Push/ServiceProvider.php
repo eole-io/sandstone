@@ -17,6 +17,10 @@ class ServiceProvider implements ServiceProviderInterface
         }
 
         $app['sandstone.push.event_serializer'] = function () use ($app) {
+            if (!$app->offsetExists('serializer')) {
+                throw new \RuntimeException('A serializer must be registered');
+            }
+
             return new EventSerializer($app['serializer']);
         };
 

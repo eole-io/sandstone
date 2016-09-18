@@ -110,6 +110,10 @@ final class Application implements WampServerInterface
     {
         $topic = $this->sandstoneApplication['sandstone.websocket.router']->loadTopic($topicPath);
 
+        if (!$this->sandstoneApplication->offsetExists('serializer')) {
+            throw new \RuntimeException('A serializer must be registered');
+        }
+
         $topic->setNormalizer($this->sandstoneApplication['serializer']);
 
         if ($topic instanceof EventSubscriberInterface) {
