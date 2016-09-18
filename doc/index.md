@@ -37,31 +37,71 @@ Then run `composer update`.
 
 ## Usage
 
-Creating a multichannel chat server:
+
+### Create a websocket topic
 
 ``` php
-// chat-server.php
-
-require_once 'vendor/autoload.php';
-
 $app = new Eole\Sandstone\Application();
 
 $app->topic('chat/{channel}', function ($topicPattern, $arguments) {
     $channelName = $arguments['channel'];
 
     return new ChatTopic($topicPattern, $channelName);
-})
-->assert('channel', '^[a-zA-Z0-9]+$');
-
-$websocketServer = new Eole\Sandstone\Websocket\Server($app);
-
-$websocketServer->run();
+});
 ```
 
-Then run chat server with `php chat-server.php`.
 
-But Sandstone is not only a framework to use websockets.
-It is meant to create a rest api working together with websocket server.
+### Dispatch an event from rest api to a websocket server topic
+
+In rest api stack:
+
+``` php
+use Symfony\Component\HttpFoundation\Response;
+
+$app = new Eole\Sandstone\Application();
+
+// Creating an api endpoint at POST api/articles
+$app->post('api/articles', function () use ($app) {
+    $event = new ArticleEvent();
+
+    $event->title = 'Unicorns spotted in Alaska';
+
+    // Dispatch an event on article creation
+    $app['dispatcher']->dispatch('article.created', $event);
+
+    return new Response([], 201);
+});
+
+// Send all 'article.created' events to push server
+$app->forwardEventToPushServer('article.created');
+```
+
+In websocket server stack:
+
+``` php
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class MyWebsocketTopic extends Eole\Sandstone\Websocket\Topic implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents()
+    {
+        return [
+            'article.created' => 'onArticleCreated',
+        ];
+    }
+
+    public function onArticleCreated(ArticleEvent $event)
+    {
+        // Broadcast message on this topic when an article has been created.
+        $this->broadcast([
+            'message' => 'An article has just been published: '.$event->title,
+        ]);
+    }
+}
+```
+
+
+### Full working examples
 
 See what you can do with examples:
 
