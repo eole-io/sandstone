@@ -28,7 +28,7 @@
                     data-count-api="/repos/eole-io/sandstone#stargazers_count"
                     data-count-href="/eole-io/sandstone/stargazers"
                     data-style="mega"
-                >Sandstone on Github</a>
+                >Star Sandstone</a>
             </li>
         </ul>
     </div>
@@ -135,31 +135,68 @@ Using composer:</p>
 
 <h2 id="usage">Usage</h2>
 
-<p>Creating a multichannel chat server:</p>
+<h3 id="create-a-websocket-topic">Create a websocket topic</h3>
 
-<div class="language-php highlighter-rouge"><pre class="highlight"><code>// chat-server.php
-
-require_once 'vendor/autoload.php';
-
-$app = new Eole\Sandstone\Application();
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>$app = new Eole\Sandstone\Application();
 
 $app-&gt;topic('chat/{channel}', function ($topicPattern, $arguments) {
     $channelName = $arguments['channel'];
 
     return new ChatTopic($topicPattern, $channelName);
-})
--&gt;assert('channel', '^[a-zA-Z0-9]+$');
-
-$websocketServer = new Eole\Sandstone\Websocket\Server($app);
-
-$websocketServer-&gt;run();
+});
 </code></pre>
 </div>
 
-<p>Then run chat server with <code class="highlighter-rouge">php chat-server.php</code>.</p>
+<h3 id="dispatch-an-event-from-rest-api-to-a-websocket-server-topic">Dispatch an event from rest api to a websocket server topic</h3>
 
-<p>But Sandstone is not only a framework to use websockets.
-It is meant to create a rest api working together with websocket server.</p>
+<p>In rest api stack:</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>use Symfony\Component\HttpFoundation\Response;
+
+$app = new Eole\Sandstone\Application();
+
+// Creating an api endpoint at POST api/articles
+$app-&gt;post('api/articles', function () use ($app) {
+    $event = new ArticleEvent();
+
+    $event-&gt;title = 'Unicorns spotted in Alaska';
+
+    // Dispatch an event on article creation
+    $app['dispatcher']-&gt;dispatch('article.created', $event);
+
+    return new Response([], 201);
+});
+
+// Send all 'article.created' events to push server
+$app-&gt;forwardEventToPushServer('article.created');
+</code></pre>
+</div>
+
+<p>In websocket server stack:</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class MyWebsocketTopic extends Eole\Sandstone\Websocket\Topic implements EventSubscriberInterface
+{
+    public static function getSubscribedEvents()
+    {
+        return [
+            'article.created' =&gt; 'onArticleCreated',
+        ];
+    }
+
+    public function onArticleCreated(ArticleEvent $event)
+    {
+        // Broadcast message on this topic when an article has been created.
+        $this-&gt;broadcast([
+            'message' =&gt; 'An article has just been published: '.$event-&gt;title,
+        ]);
+    }
+}
+</code></pre>
+</div>
+
+<h3 id="full-working-examples">Full working examples</h3>
 
 <p>See what you can do with examples:</p>
 
@@ -182,15 +219,19 @@ It is meant to create a rest api working together with websocket server.</p>
         <div class="text-center">
             <p>Sandstone is under <a href="https://github.com/eole-io/sandstone/blob/master/LICENSE">MIT license</a>.</p>
             <br />
-            <a
-                href="https://github.com/alcalyn"
-                class="github-button"
-                aria-label="Follow @alcalyn on GitHub"
-                data-count-aria-label="# followers on GitHub"
-                data-count-api="/users/alcalyn#followers"
-                data-count-href="/alcalyn/followers"
-                data-style="mega"
-            >Follow @alcalyn</a>
+            <p>
+                Find me here:
+                <br />
+                <a href="https://github.com/alcalyn">
+                    <i class="fa fa-github fa-lg" aria-hidden="true"></i>
+                    alcalyn
+                </a>
+                -
+                <a href="https://twitter.com/alcalyn_">
+                    <i class="fa fa-twitter fa-lg" aria-hidden="true"></i>
+                    alcalyn_
+                </a>
+            </p>
         </div>
     </div>
 </footer>

@@ -5,8 +5,15 @@ body {
 blockquote {
     font-size: 16px;
 }
-nav.nav-top ul li iframe {
-    margin: 16px 16px 0 0;
+@media (max-width: 767px) {
+    nav.nav-top ul li iframe {
+        margin-top: 6px;
+    }
+}
+@media (min-width: 768px) {
+    nav.nav-top ul li iframe {
+        margin: 16px 16px 0 0;
+    }
 }
 nav.nav-left {
     margin-bottom: 24px;
@@ -42,12 +49,20 @@ nav.nav-left a span {
 .jumbotron {
     background-image: url("../img/triangles-bg.png");
     background-color: rgb(121, 167, 54);
-    height: 300px;
+    min-height: 300px;
     color: white;
     text-shadow: 0 0 22px rgba(0, 0, 0, 0.75);
+}
+@media (min-width: 768px) {
+    .jumbotron .btn-lg {
+        margin-bottom: -8px;
+    }
 }
 footer {
     margin-top: 42px;
     background-color: #f8f5f0;
     padding: 24px 0 42px 0;
+}
+footer i:before {
+    color: #3e3f3a;
 }
