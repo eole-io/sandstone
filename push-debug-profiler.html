@@ -48,7 +48,7 @@
         <div class="col-sm-3">
             <nav class="nav nav-left">
     <ul class="nav nav-pills nav-stacked">
-        <li class="active"
+        <li 
 >
             <a href="/sandstone/">
                 <i class="fa fa-home" aria-hidden="true"></i>
@@ -75,7 +75,7 @@
                 <span>Websocket</span>
             </a>
         </li>
-        <li 
+        <li class="active"
 >
             <a href="/sandstone/push-debug-profiler.html">
                 <i class="fa fa-list-alt" aria-hidden="true"></i>
@@ -107,116 +107,46 @@
 
         </div>
         <div class="col-sm-9">
-            <h2 class="no-margin-top">Introduction</h2>
+            <h1 class="no-margin-top">Push debug profiler</h1>
 
-<p>If you want to build a PHP application with real-time stuff,
-this library can help you to use websockets in a structured application.</p>
+<p>Sandstone integrates a development tool, the push debug profiler.</p>
 
-<p>What you can achieve with Sandstone:</p>
+<p>It logs all messages that has been sent to the websocket server
+during call to the rest api.</p>
 
-<ul>
-  <li>Create a Rest Api using Silex (Sandstone extends Silex)</li>
-  <li>Create a websocket topic the same way as creating an api endpoint</li>
-  <li>Dispatch event from Rest Api to Websocket server using Symfony event dispatcher</li>
-</ul>
+<p><img src="img/push-debug-profiler-screen.png" alt="Push debug profiler screenschot" class="img-responsive img-thumbnail" /></p>
 
-<h2 id="installation">Installation</h2>
+<h2 id="enable-the-push-debug-profiler">Enable the push debug profiler</h2>
 
-<p>Sandstone needs:</p>
+<p>Just register the profiler by adding:</p>
 
-<ul>
-  <li>PHP &gt;= 5.5</li>
-  <li>ZMQ and ZMQ php extension (or see <a href="/sandstone/install-zmq-php-linux.html">Install ZMQ and php-zmq on Linux</a>)</li>
-</ul>
-
-<p>Sandstone is on composer (<a href="https://packagist.org/packages/eole/sandstone">eole/sandstone</a>).
-Using composer:</p>
-
-<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
-    </span><span class="nt">"require"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-        </span><span class="nt">"eole/sandstone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.x"</span><span class="w">
-    </span><span class="p">}</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre>
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>$app-&gt;register(new Eole\Sandstone\Push\Debug\PushServerProfilerServiceProvider());
+</code></pre>
 </div>
 
-<p>Then run <code class="highlighter-rouge">composer update</code>.</p>
+<p>where <code class="highlighter-rouge">$app</code> is your Sandstone instance.</p>
+
+<blockquote>
+  <p><strong>Note</strong>:
+It assumes you have
+<a href="https://github.com/silexphp/Silex-WebProfiler">installed the Symfony profiler</a>
+in your Silex installation.</p>
+</blockquote>
 
 <h2 id="usage">Usage</h2>
 
-<h3 id="create-a-websocket-topic">Create a websocket topic</h3>
+<p>Once registered, a “Push” panel should appear in <code class="highlighter-rouge">/_profiler</code>.</p>
 
-<div class="language-php highlighter-rouge"><pre class="highlight"><code>$app = new Eole\Sandstone\Application();
+<p>This panel logs all messages with their content, size, event class and event name.</p>
 
-$app-&gt;topic('chat/{channel}', function ($topicPattern, $arguments) {
-    $channelName = $arguments['channel'];
+<blockquote>
+  <p><strong>Note</strong>:
+Just refreshing an old panel won’t work.
+You must make a new request, then open it in with the profiler
+to see the “Push” panel.</p>
+</blockquote>
 
-    return new ChatTopic($topicPattern, $channelName);
-});
-</code></pre>
-</div>
-
-<h3 id="dispatch-an-event-from-rest-api-to-a-websocket-server-topic">Dispatch an event from rest api to a websocket server topic</h3>
-
-<p>In rest api stack:</p>
-
-<div class="language-php highlighter-rouge"><pre class="highlight"><code>use Symfony\Component\HttpFoundation\Response;
-
-$app = new Eole\Sandstone\Application();
-
-// Creating an api endpoint at POST api/articles
-$app-&gt;post('api/articles', function () use ($app) {
-    $event = new ArticleEvent();
-
-    $event-&gt;title = 'Unicorns spotted in Alaska';
-
-    // Dispatch an event on article creation
-    $app['dispatcher']-&gt;dispatch('article.created', $event);
-
-    return new Response([], 201);
-});
-
-// Send all 'article.created' events to push server
-$app-&gt;forwardEventToPushServer('article.created');
-</code></pre>
-</div>
-
-<p>In websocket server stack:</p>
-
-<div class="language-php highlighter-rouge"><pre class="highlight"><code>use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-class MyWebsocketTopic extends Eole\Sandstone\Websocket\Topic implements EventSubscriberInterface
-{
-    public static function getSubscribedEvents()
-    {
-        return [
-            'article.created' =&gt; 'onArticleCreated',
-        ];
-    }
-
-    public function onArticleCreated(ArticleEvent $event)
-    {
-        // Broadcast message on this topic when an article has been created.
-        $this-&gt;broadcast([
-            'message' =&gt; 'An article has just been published: '.$event-&gt;title,
-        ]);
-    }
-}
-</code></pre>
-</div>
-
-<h3 id="full-working-examples">Full working examples</h3>
-
-<p>See what you can do with examples:</p>
-
-<ul>
-  <li><a href="/sandstone/examples/full.html">Full example of a rest api working with a websocket server</a></li>
-  <li><a href="/sandstone/examples/multichannel-chat.html">Multichannel chat server</a></li>
-</ul>
-
-<h2 id="license">License</h2>
-
-<p>Sandstone is under <a href="https://github.com/eole-io/sandstone/blob/master/LICENSE">MIT license</a>.</p>
+<p>Another note: There is no icon for the Push panel, I didn’t find one, so if you have an idea… :D</p>
 
         </div>
     </div>
