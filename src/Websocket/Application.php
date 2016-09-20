@@ -180,6 +180,6 @@ final class Application implements WampServerInterface
      */
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
-        $this->logger->info('Connection event', ['event' => 'error']);
+        $this->logger->info('Connection event', ['event' => 'error', 'message' => $e->getMessage()]);
     }
 }
