@@ -16,36 +16,6 @@ class ChatTopic extends Eole\Sandstone\Websocket\Topic implements EventSubscribe
     }
 
     /**
-     * Notify all subscribing clients that a new client has subscribed to this channel.
-     *
-     * {@InheritDoc}
-     */
-    public function onSubscribe(Ratchet\Wamp\WampConnection $conn, $topic)
-    {
-        parent::onSubscribe($conn, $topic);
-
-        $this->broadcast([
-            'type' => 'join',
-            'message' => 'Someone has joined this channel.',
-        ]);
-    }
-
-    /**
-     * Notify all subscribing clients that a new client has unsubscribed from this channel.
-     *
-     * {@InheritDoc}
-     */
-    public function onUnSubscribe(Ratchet\Wamp\WampConnection $conn, $topic)
-    {
-        parent::onUnSubscribe($conn, $topic);
-
-        $this->broadcast([
-            'type' => 'leave',
-            'message' => 'Someone has left this channel.',
-        ]);
-    }
-
-    /**
      * Subscribe to article.created event.
      *
      * {@InheritDoc}
