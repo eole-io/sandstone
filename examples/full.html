@@ -61,7 +61,7 @@
 >
             <a href="/sandstone/examples/full.html">
                 <i class="fa fa-code" aria-hidden="true"></i>
-                Example: Full react server
+                Example: Full app
                 <br>
                 <span>RestApi + Websocket + Push</span>
             </a>
@@ -142,6 +142,7 @@
     to notice chat users that an article has just been published.
 </p>
 
+
 <h2>Installation</h2>
 
 Create your composer.json:
@@ -165,6 +166,7 @@ Create your composer.json:
 
 
 Then run <code>composer update</code>.
+
 
 <h2>Project structure</h2>
 
@@ -301,66 +303,37 @@ $websocketServer->run();
     </div>
 </div>
 
-<h2>Now, let's run the thing</h2>
 
-<div class="row">
-    <div class="col-sm-6">
-        <p>The rest api endpoint will be hit with:</p>
-        <pre>POST rest-api.php/api/articles
-
-HTTP/1.1 201 Created
-Content-Length: 2
-Content-Type: application/json
-
-42
-</pre>
-    </div>
-    <div class="col-sm-6">
-        <p>Run the websocket server and push server with:</p>
-        <pre>php websocket-server.php
-
-# Websocket server is starting
-[info] Initialization... []
-[info] Bind websocket server {"bind":"0.0.0.0","port":"25569"}
-[info] Bind push server {"bind":"127.0.0.1","host":"127.0.0.1","port":5555}
-
-# Someone connects to websocket server
-[info] Connection event {"event":"open"}
-[info] Authentication... []
-[info] Anonymous connection []
-
-# the connected guy subscribes to a chat topic
-[info] Topic event {"event":"subscribe","topic":"chat/general"}
-
-# Websocket server received an event from rest api
-[info] Push message event {"event":"article.created"}
-</pre>
-    </div>
-</div>
-
-<h2>About topic classes</h2>
+<h2>Implement ChatTopic class</h2>
 
 <p>
-    In this example, we used <code>ChatTopic</code> class.
+    In this example, we used a <code>ChatTopic</code> class.
 </p>
 <p>
-    A topic class must extend <code>Eole\Sandstone\Websocket\Topic</code>,
-    and implement logic to apply when a client <b>subscribes</b>, <b>publishes</b> a message,
-    and <b>unsubscribes</b> from topic (here <code>chat/{channel}</code>).
+    In our case, we want:
+</p>
+<ul>
+    <li>
+        <code>ChatTopic</code> just broadcast all incoming chat messages to every subscribers,
+    </li>
+    <li>
+        broadcast a message when an article has been posted.
+    </li>
+</ul>
+<p>
+    So we need to listen to <code>article.created</code> event:
+    <br>
+    The topic class has to implement <code>Symfony\Component\EventDispatcher\EventSubscriberInterface</code>
+    to automatically listen to events (to be used with <code>forwardEventToPushServer</code>).
 </p>
 <p>
-    Another thing, the topic class can also implement <code>Symfony\Component\EventDispatcher\EventSubscriberInterface</code>
-    to automatically listen to events. Usefull when used with <code>forwardEventToPushServer</code>.
-</p>
-<p>
-    See <code>ChatTopic</code> example class:
+    So let's implement <code>ChatTopic</code> class:
 </p>
 
 <p class="file">
     <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
     src/ChatTopic.php
 </p>
-
 
 <pre><code class="language-php">use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -376,36 +349,6 @@ class ChatTopic extends Eole\Sandstone\Websocket\Topic implements EventSubscribe
         $this->broadcast([
             'type' => 'message',
             'message' => $event,
-        ]);
-    }
-
-    /**
-     * Notify all subscribing clients that a new client has subscribed to this channel.
-     *
-     * {@InheritDoc}
-     */
-    public function onSubscribe(Ratchet\Wamp\WampConnection $conn, $topic)
-    {
-        parent::onSubscribe($conn, $topic);
-
-        $this->broadcast([
-            'type' => 'join',
-            'message' => 'Someone has joined this channel.',
-        ]);
-    }
-
-    /**
-     * Notify all subscribing clients that a new client has unsubscribed from this channel.
-     *
-     * {@InheritDoc}
-     */
-    public function onUnSubscribe(Ratchet\Wamp\WampConnection $conn, $topic)
-    {
-        parent::onUnSubscribe($conn, $topic);
-
-        $this->broadcast([
-            'type' => 'leave',
-            'message' => 'Someone has left this channel.',
         ]);
     }
 
@@ -435,6 +378,7 @@ class ChatTopic extends Eole\Sandstone\Websocket\Topic implements EventSubscribe
     }
 }
 </code></pre>
+
 
 
 <h2>About serialization</h2>
@@ -516,6 +460,46 @@ $this['serializer.builder']-&gt;addMetadataDir(
     __DIR__,
     ''
 );</code></pre></figure>
+    </div>
+</div>
+
+
+<h2>Now, let's run the thing</h2>
+
+<div class="row">
+    <div class="col-sm-6">
+        <p>The rest api endpoint will be hit with:</p>
+        <pre><code class="language-">POST rest-api.php/api/articles
+
+HTTP/1.1 201 Created
+Content-Length: 2
+Content-Type: application/json
+
+42
+</code></pre>
+
+    </div>
+    <div class="col-sm-6">
+        <p>Run the websocket server and push server with:</p>
+        <pre><code class="language-php">php websocket-server.php
+
+# Websocket server is starting
+[info] Initialization... []
+[info] Bind websocket server {"bind":"0.0.0.0","port":"25569"}
+[info] Bind push server {"bind":"127.0.0.1","host":"127.0.0.1","port":5555}
+
+# Someone connects to websocket server
+[info] Connection event {"event":"open"}
+[info] Authentication... []
+[info] Anonymous connection []
+
+# the connected guy subscribes to a chat topic
+[info] Topic event {"event":"subscribe","topic":"chat/general"}
+
+# Websocket server received an event from rest api
+[info] Push message event {"event":"article.created"}
+</code></pre>
+
     </div>
 </div>
 
