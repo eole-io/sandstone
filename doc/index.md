@@ -22,17 +22,9 @@ Sandstone needs:
 - ZMQ and ZMQ php extension (or see [Install ZMQ and php-zmq on Linux]({{ site.baseurl }}/install-zmq-php-linux.html))
 
 Sandstone is on composer ([eole/sandstone](https://packagist.org/packages/eole/sandstone)).
-Using composer:
+Installation using composer:
 
-``` json
-{
-    "require": {
-        "eole/sandstone": "1.x"
-    }
-}
-```
-
-Then run `composer update`.
+<pre class="command-line" data-prompt="$"><code class="language-bash">composer require eole/sandstone</code></pre>
 
 
 ## Usage
