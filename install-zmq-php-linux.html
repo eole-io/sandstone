@@ -114,41 +114,35 @@
 (May 2012)
 which installs ZeroMQ 2 on Ubuntu 11.10 and php 5.3.</p>
 
-<p>This tuto installs a ZeroMQ 4 on a Raspberry Pi 3 with minimal Debian Jessie, php7.</p>
+<p>This tuto installs a ZeroMQ 4 on Debian Jessie, php7.</p>
 
 <h2 id="requirements">Requirements</h2>
 
 <p>Make sure you have all the packages:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>sudo apt-get install build-essential libtool autoconf uuid-dev pkg-config git libsodium
+<pre class="command-line" data-prompt="$" data-output="2-3"><code class="language-bash">sudo apt-get install build-essential libtool autoconf uuid-dev pkg-config git libsodium
 
-<span class="c">## and PHP depending on your version, one of these set of packages:</span>
+## and PHP depending on your version, one of these set of packages:
 sudo apt-get install php7.0 php7.0-dev
 sudo apt-get install php5 php5-dev
-sudo apt-get install php php-dev
-</code></pre>
-</div>
+sudo apt-get install php php-dev</code></pre>
 
 <blockquote>
   <p><strong>Note for Ubuntu</strong>:
-<code class="highlighter-rouge">libsodium</code> has another package name on ubuntu, it is <code class="highlighter-rouge">libsodium-dev</code>.</p>
-
-  <p>Go to <a href="https://github.com/jonathanpmartins">Jonathan Prass Martins</a>’s gist to see how to install it:</p>
-
-  <p><a href="https://gist.github.com/jonathanpmartins/2510f38abee1e65c6d92">https://gist.github.com/jonathanpmartins/2510f38abee1e65c6d92</a></p>
+<code class="highlighter-rouge">libsodium</code> has another package name on ubuntu: <code class="highlighter-rouge">libsodium-dev</code>.
+Check <a href="https://github.com/jonathanpmartins">Jonathan Prass Martins</a>’ gist to see how to install it:
+<a href="https://gist.github.com/jonathanpmartins/2510f38abee1e65c6d92">https://gist.github.com/jonathanpmartins/2510f38abee1e65c6d92</a></p>
 </blockquote>
 
 <h2 id="install-zeromq">Install ZeroMQ</h2>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>wget https://archive.org/download/zeromq_4.1.4/zeromq-4.1.4.tar.gz <span class="c"># Latest tarball on 07/08/2016</span>
+<pre class="command-line" data-prompt="$"><code class="language-bash">wget https://archive.org/download/zeromq_4.1.4/zeromq-4.1.4.tar.gz # Latest tarball on 07/08/2016
 tar -xvzf zeromq-4.1.4.tar.gz
-<span class="nb">cd </span>zeromq-4.1.4
+cd zeromq-4.1.4
 ./configure
 make
 sudo make install
-sudo ldconfig
-</code></pre>
-</div>
+sudo ldconfig</code></pre>
 
 <blockquote>
   <p><strong>Note</strong>:
@@ -158,13 +152,11 @@ Check the lastest tarball release here:
 
 <h2 id="installing-the-php-binding">Installing the PHP binding</h2>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>git clone git://github.com/mkoppanen/php-zmq.git
-<span class="nb">cd </span>php-zmq
-phpize <span class="o">&amp;&amp;</span> ./configure
+<pre class="command-line" data-prompt="$"><code class="language-bash">git clone git://github.com/mkoppanen/php-zmq.git
+cd php-zmq
+phpize &amp;&amp; ./configure
 make
-sudo make install
-</code></pre>
-</div>
+sudo make install</code></pre>
 
 <p>Then add <code class="highlighter-rouge">extension=zmq.so</code> in either:</p>
 

@@ -244,13 +244,19 @@ $app-&gt;topic('chat/{channel}', function ($topicPattern, $arguments) {
 </code></pre>
 </div>
 
-<p>Then you get as arguments:</p>
+<p>Then when someone subscribes to the topic <code class="highlighter-rouge">chat/general</code> for the first time,
+this factory is called with arguments:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$topicPattern =&gt; 'chat/general', or 'chat/wtf-you-put-here'
-$arguments =&gt; ['channel' =&gt; 'general']
+<div class="highlighter-rouge"><pre class="highlight"><code>Array
+(
+    [topicPattern] =&gt; 'chat/general'
+    [arguments] =&gt; Array
+        (
+            [channel] =&gt; general
+        )
+)
 </code></pre>
 </div>
-
 
         </div>
     </div>
