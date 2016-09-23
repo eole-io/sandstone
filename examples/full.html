@@ -469,19 +469,17 @@ $this['serializer.builder']-&gt;addMetadataDir(
 <div class="row">
     <div class="col-sm-6">
         <p>The rest api endpoint will be hit with:</p>
-        <pre><code class="language-">POST rest-api.php/api/articles
+        <pre class="command-line" data-prompt="$" data-output="2-200"><code class="language-bash">POST rest-api.php/api/articles
 
 HTTP/1.1 201 Created
 Content-Length: 2
 Content-Type: application/json
 
-42
-</code></pre>
-
+42</code></pre>
     </div>
     <div class="col-sm-6">
         <p>Run the websocket server and push server with:</p>
-        <pre><code class="language-php">php websocket-server.php
+        <pre class="command-line" data-prompt="$" data-output="2-200"><code class="language-bash">php websocket-server.php
 
 # Websocket server is starting
 [info] Initialization... []
@@ -497,9 +495,7 @@ Content-Type: application/json
 [info] Topic event {"event":"subscribe","topic":"chat/general"}
 
 # Websocket server received an event from rest api
-[info] Push message event {"event":"article.created"}
-</code></pre>
-
+[info] Push message event {"event":"article.created"}</code></pre>
     </div>
 </div>
 

@@ -112,24 +112,6 @@
 <p>This example mount a multichannel chat server
 using Sandstone topic creation feature.</p>
 
-<h2 id="installation">Installation</h2>
-
-<p>Create your composer.json:</p>
-
-<p class="file">
-    <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
-    composer.json
-</p>
-
-<pre><code class="language-json">{
-    "require": {
-        "eole/sandstone": "^1.1"
-    }
-}
-</code></pre>
-
-<p>Then run <code class="highlighter-rouge">composer update</code>.</p>
-
 <h2 id="server-script">Server script</h2>
 
 <p>You will first need to create the topic class.</p>
@@ -164,7 +146,7 @@ to broadcast a message to every subscribing client, example:</p>
 </code></pre>
 </div>
 
-<p>Then we have enough to create the <code class="highlighter-rouge">ChatTopic</code> class:</p>
+<p>Then let’s create the <code class="highlighter-rouge">ChatTopic</code> class:</p>
 
 <p class="file">
     <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
@@ -348,9 +330,7 @@ in order to work with WAMP <strong>v1</strong>.</p>
 
 <p>Then, run your chat server:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code>php chat-server.php
-</code></pre>
-</div>
+<pre class="command-line" data-prompt="$"><code class="language-bash">php chat-server.php</code></pre>
 
 <p>And go to this page. You should receive chat messages in your Javascript console.</p>
 
