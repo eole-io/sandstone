@@ -24,7 +24,7 @@ sudo apt-get install php5 php5-dev
 sudo apt-get install php php-dev</code></pre>
 
 > **Note for Ubuntu**:
-> `libsodium` has another package name on ubuntu: `libsodium-dev`.
+> `libsodium` package has another name: `libsodium-dev`.
 > Check [Jonathan Prass Martins](https://github.com/jonathanpmartins)' gist to see how to install it:
 > [https://gist.github.com/jonathanpmartins/2510f38abee1e65c6d92](https://gist.github.com/jonathanpmartins/2510f38abee1e65c6d92)
 
