@@ -26,8 +26,16 @@ It will watch for file changes, so just refresh after your changes.
 
 ## Publish
 
+Full publish documentation script (from a blank folder):
+
 ``` bash
+#!/bin/bash
+
+rm -fr /tmp/sandstone sandstone
+git clone git@github.com:eole-io/sandstone.git --branch=dev
 cd sandstone/doc
+git fetch origin
+
 bundle exec jekyll build --destination /tmp/sandstone/
 cd ..
 git checkout gh-pages
@@ -37,6 +45,8 @@ rm Gemfile Gemfile.lock README.md
 git add -A
 git ci -m "Publish"
 git push origin gh-pages
-git checkout dev # or the branch you were
-rm -fr /tmp/sandstone
+git checkout dev
+cd ..
+
+rm -fr /tmp/sandstone sandstone
 ```

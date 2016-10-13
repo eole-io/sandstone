@@ -138,10 +138,16 @@ $app
 ;
 ```
 
-Then you get as arguments:
+Then when someone subscribes to the topic `chat/general` for the first time,
+this factory is called with arguments:
 
 ```
-$topicPattern => 'chat/general', or 'chat/wtf-you-put-here'
-$arguments => ['channel' => 'general']
+Array
+(
+    [topicPattern] => 'chat/general'
+    [arguments] => Array
+        (
+            [channel] => general
+        )
+)
 ```
-

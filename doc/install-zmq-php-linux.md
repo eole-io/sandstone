@@ -9,40 +9,34 @@ This documentation has been strongly inspired from
 (May 2012)
 which installs ZeroMQ 2 on Ubuntu 11.10 and php 5.3.
 
-This tuto installs a ZeroMQ 4 on a Raspberry Pi 3 with minimal Debian Jessie, php7.
+This tuto installs a ZeroMQ 4 on Debian Jessie, php7.
 
 
 ## Requirements
 
 Make sure you have all the packages:
 
-``` bash
-sudo apt-get install build-essential libtool autoconf uuid-dev pkg-config git libsodium
+<pre class="command-line" data-prompt="$" data-output="2-3"><code class="language-bash">sudo apt-get install build-essential libtool autoconf uuid-dev pkg-config git libsodium
 
 ## and PHP depending on your version, one of these set of packages:
 sudo apt-get install php7.0 php7.0-dev
 sudo apt-get install php5 php5-dev
-sudo apt-get install php php-dev
-```
+sudo apt-get install php php-dev</code></pre>
 
 > **Note for Ubuntu**:
-> `libsodium` has another package name on ubuntu, it is `libsodium-dev`.
->
-> Go to [Jonathan Prass Martins](https://github.com/jonathanpmartins)'s gist to see how to install it:
->
+> `libsodium` package has another name: `libsodium-dev`.
+> Check [Jonathan Prass Martins](https://github.com/jonathanpmartins)' gist to see how to install it:
 > [https://gist.github.com/jonathanpmartins/2510f38abee1e65c6d92](https://gist.github.com/jonathanpmartins/2510f38abee1e65c6d92)
 
 ## Install ZeroMQ
 
-``` bash
-wget https://archive.org/download/zeromq_4.1.4/zeromq-4.1.4.tar.gz # Latest tarball on 07/08/2016
+<pre class="command-line" data-prompt="$"><code class="language-bash">wget https://archive.org/download/zeromq_4.1.4/zeromq-4.1.4.tar.gz # Latest tarball on 07/08/2016
 tar -xvzf zeromq-4.1.4.tar.gz
 cd zeromq-4.1.4
 ./configure
 make
 sudo make install
-sudo ldconfig
-```
+sudo ldconfig</code></pre>
 
 > **Note**:
 > Check the lastest tarball release here:
@@ -51,13 +45,11 @@ sudo ldconfig
 
 ## Installing the PHP binding
 
-``` bash
-git clone git://github.com/mkoppanen/php-zmq.git
+<pre class="command-line" data-prompt="$"><code class="language-bash">git clone git://github.com/mkoppanen/php-zmq.git
 cd php-zmq
 phpize && ./configure
 make
-sudo make install
-```
+sudo make install</code></pre>
 
 Then add `extension=zmq.so` in either:
 

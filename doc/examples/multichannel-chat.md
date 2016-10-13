@@ -8,16 +8,6 @@ This example mount a multichannel chat server
 using Sandstone topic creation feature.
 
 
-## Installation
-
-Create your composer.json:
-
-{% include file-title.html filename="composer.json" %}
-{% include highlight-file.html filename="examples/multichannel-chat/composer.json" code="json" %}
-
-Then run `composer update`.
-
-
 ## Server script
 
 You will first need to create the topic class.
@@ -48,7 +38,7 @@ $this->broadcast([
 ]);
 ```
 
-Then we have enough to create the `ChatTopic` class:
+Then let's create the `ChatTopic` class:
 
 {% include file-title.html filename="ChatTopic.php" %}
 {% include highlight-file.html filename="examples/multichannel-chat/ChatTopic.php" code="php" %}
@@ -113,8 +103,6 @@ Following the documentation, we can use our chat with:
 
 Then, run your chat server:
 
-``` bash
-php chat-server.php
-```
+<pre class="command-line" data-prompt="$"><code class="language-bash">php chat-server.php</code></pre>
 
 And go to this page. You should receive chat messages in your Javascript console.

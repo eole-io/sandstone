@@ -37,6 +37,7 @@ layout: page
     to notice chat users that an article has just been published.
 </p>
 
+
 <h2>Installation</h2>
 
 Create your composer.json:
@@ -45,6 +46,7 @@ Create your composer.json:
 {% include highlight-file.html filename="examples/full/composer.json" code="json" %}
 
 Then run <code>composer update</code>.
+
 
 <h2>Project structure</h2>
 
@@ -78,40 +80,36 @@ Then run <code>composer update</code>.
     </div>
 </div>
 
-<h2>Now, let's run the thing</h2>
 
-<div class="row">
-    <div class="col-sm-6">
-        <p>The rest api endpoint will be hit with:</p>
-        <pre>{% include examples/full/curl.log %}</pre>
-    </div>
-    <div class="col-sm-6">
-        <p>Run the websocket server and push server with:</p>
-        <pre>{% include examples/full/websocket-server.log %}</pre>
-    </div>
-</div>
-
-<h2>About topic classes</h2>
+<h2>Implement ChatTopic class</h2>
 
 <p>
-    In this example, we used <code>ChatTopic</code> class.
+    In this example, we used a <code>ChatTopic</code> class.
 </p>
 <p>
-    A topic class must extend <code>Eole\Sandstone\Websocket\Topic</code>,
-    and implement logic to apply when a client <b>subscribes</b>, <b>publishes</b> a message,
-    and <b>unsubscribes</b> from topic (here <code>chat/{channel}</code>).
+    In our case, we want:
+</p>
+<ul>
+    <li>
+        <code>ChatTopic</code> just broadcast all incoming chat messages to every subscribers,
+    </li>
+    <li>
+        broadcast a message when an article has been posted.
+    </li>
+</ul>
+<p>
+    So we need to listen to <code>article.created</code> event:
+    <br>
+    The topic class has to implement <code>Symfony\Component\EventDispatcher\EventSubscriberInterface</code>
+    to automatically listen to events (to be used with <code>forwardEventToPushServer</code>).
 </p>
 <p>
-    Another thing, the topic class can also implement <code>Symfony\Component\EventDispatcher\EventSubscriberInterface</code>
-    to automatically listen to events. Usefull when used with <code>forwardEventToPushServer</code>.
-</p>
-<p>
-    See <code>ChatTopic</code> example class:
+    So let's implement <code>ChatTopic</code> class:
 </p>
 
 {% include file-title.html filename="src/ChatTopic.php" %}
-
 {% include highlight-file.html filename="examples/full/src/ChatTopic.php" code="php" %}
+
 
 <h2>About serialization</h2>
 
@@ -152,5 +150,19 @@ $this['serializer.builder']->addMetadataDir(
     ''
 );
 {% endhighlight %}
+    </div>
+</div>
+
+
+<h2>Now, let's run the thing</h2>
+
+<div class="row">
+    <div class="col-sm-6">
+        <p>The rest api endpoint will be hit with:</p>
+        <pre class="command-line" data-prompt="$" data-output="2-200"><code class="language-bash">{% include examples/full/curl.log %}</code></pre>
+    </div>
+    <div class="col-sm-6">
+        <p>Run the websocket server and push server with:</p>
+        <pre class="command-line" data-prompt="$" data-output="2-200"><code class="language-bash">{% include examples/full/websocket-server.log %}</code></pre>
     </div>
 </div>
