@@ -23,7 +23,7 @@ class SerializerBuilder extends BaseSerializerBuilder
     public static function create()
     {
         return parent::create()
-            ->setDefaultSerializationContextFactory(array(self::class, 'createDefaultSerializationContext'))
+            ->setSerializationContextFactory(array(self::class, 'createDefaultSerializationContext'))
             ->addDefaultHandlers()
             ->configureListeners(function (EventDispatcher $dispatcher) {
                 $proxySubscriber = new DoctrineProxySubscriber(false);
