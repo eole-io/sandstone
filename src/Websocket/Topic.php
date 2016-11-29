@@ -2,7 +2,7 @@
 
 namespace Eole\Sandstone\Websocket;
 
-use JMS\Serializer\NormalizerInterface;
+use JMS\Serializer\ArrayTransformerInterface;
 use Ratchet\Wamp\WampConnection;
 use Ratchet\Wamp\Topic as BaseTopic;
 
@@ -14,7 +14,7 @@ class Topic extends BaseTopic
     protected $arguments;
 
     /**
-     * @var NormalizerInterface
+     * @var ArrayTransformerInterface
      */
     protected $normalizer;
 
@@ -30,11 +30,11 @@ class Topic extends BaseTopic
     }
 
     /**
-     * @param NormalizerInterface $normalizer
+     * @param ArrayTransformerInterface $normalizer
      *
      * @return self
      */
-    public function setNormalizer(NormalizerInterface $normalizer)
+    public function setNormalizer(ArrayTransformerInterface $normalizer)
     {
         $this->normalizer = $normalizer;
 
