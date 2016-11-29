@@ -1,5 +1,6 @@
 ---
 layout: page
+title: Push debug profiler
 ---
 
 <h1 class="no-margin-top">Push debug profiler</h1>

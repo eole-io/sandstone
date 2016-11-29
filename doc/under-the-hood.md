@@ -1,5 +1,6 @@
 ---
 layout: page
+title: Under the hood
 ---
 
 <h1 class="no-margin-top">Under the hood</h1>
