@@ -20,13 +20,13 @@ Sandstone extends Silex to easily mount a RestApi working together with a **Webs
 Running tests:
 
 ``` bash
-vendor\bin\phpunit -c .
+vendor/bin/phpunit -c .
 ```
 
 Checking code style:
 
 ``` bash
-vendor\bin\phpcs src --standard=phpcs.xml
+vendor/bin/phpcs src --standard=phpcs.xml
 ```
 
 

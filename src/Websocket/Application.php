@@ -140,7 +140,7 @@ final class Application implements WampServerInterface
     {
         $this->logger->info('Topic event', ['event' => 'publish', 'topic' => $topic]);
 
-        $this->topics[$topic]->onPublish($conn, $topic, $event);
+        $this->getTopic($topic)->onPublish($conn, $topic, $event);
     }
 
     /**
@@ -150,7 +150,7 @@ final class Application implements WampServerInterface
     {
         $this->logger->info('Topic event', ['event' => 'unsubscribe', 'topic' => $topic]);
 
-        $this->topics[$topic]->onUnSubscribe($conn, $topic);
+        $this->getTopic($topic)->onUnSubscribe($conn, $topic);
     }
 
     /**

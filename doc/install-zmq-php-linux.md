@@ -1,5 +1,6 @@
 ---
 layout: page
+title: Install ZMQ and php-zmq extension on Debian or Ubuntu
 ---
 
 <h1 class="no-margin-top">Install ZMQ and php-zmq extension</h1>
@@ -23,8 +24,8 @@ sudo apt-get install php7.0 php7.0-dev
 sudo apt-get install php5 php5-dev
 sudo apt-get install php php-dev</code></pre>
 
-> **Note for Ubuntu**:
-> `libsodium` package has another name: `libsodium-dev`.
+> **Note**:
+> If `libsodium` is not found, try `libsodium-dev`.
 > Check [Jonathan Prass Martins](https://github.com/jonathanpmartins)' gist to see how to install it:
 > [https://gist.github.com/jonathanpmartins/2510f38abee1e65c6d92](https://gist.github.com/jonathanpmartins/2510f38abee1e65c6d92)
 
@@ -51,7 +52,7 @@ phpize && ./configure
 make
 sudo make install</code></pre>
 
-Then add `extension=zmq.so` in either:
+Then add the line `extension=zmq.so` in either:
 
 - your php.ini files (apache2 and cli ones)
 - or in file `/etc/php/7.0/mods-available/zmq.ini`, then run `sudo phpenmod zmq`
