@@ -101,6 +101,13 @@ See what you can do with examples:
 - [Multichannel chat server]({{ site.baseurl }}/examples/multichannel-chat.html)
 
 
+#### Docker
+
+A full example of a Sandstone application also exists as a Docker image.
+
+Check it on Bitbucket: [zareba_pawel/php-websockets-sandstone](https://bitbucket.org/zareba_pawel/php-websockets-sandstone)
+
+
 ## License
 
 Sandstone is under [MIT license](https://github.com/eole-io/sandstone/blob/master/LICENSE).
