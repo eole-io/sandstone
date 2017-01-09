@@ -14,7 +14,7 @@ class EventForwarderTest extends \PHPUnit_Framework_TestCase
     {
         $pushServerMock = $this->getMockForAbstractClass(PushServerInterface::class);
         $eventDispatcherMock = $this->getMockForAbstractClass(EventDispatcherInterface::class);
-        $eventSerializerMock = $this->getMock(EventSerializer::class, [], [], '', false);
+        $eventSerializerMock = $this->createMock(EventSerializer::class);
 
         $eventForwarder = new EventForwarder($pushServerMock, $eventDispatcherMock, $eventSerializerMock);
 

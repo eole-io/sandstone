@@ -11,4 +11,4 @@ before_script:
 
 script:
     - ./vendor/bin/phpcs --standard=phpcs.xml src
-    - phpunit -c .
+    - ./vendor/bin/phpunit -c .

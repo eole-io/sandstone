@@ -18,7 +18,7 @@ class WebsocketServerTest extends \PHPUnit_Framework_TestCase
         $wsApp = new \Eole\Sandstone\Websocket\Application($app);
         $wsApp->setLogger(new NullLogger());
 
-        $connectionMock = $this->getMock(WampConnection::class, [], [], '', false);
+        $connectionMock = $this->createMock(WampConnection::class);
 
         $wsApp->onSubscribe($connectionMock, 'articles');
     }
