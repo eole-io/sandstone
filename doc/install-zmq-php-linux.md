@@ -5,12 +5,12 @@ title: Install ZMQ and php-zmq extension on Debian or Ubuntu
 
 <h1 class="no-margin-top">Install ZMQ and php-zmq extension</h1>
 
+All the required steps to make ZeroMQ 4 work with php7 on Debian or Ubuntu.
+
 This documentation has been strongly inspired from
 [http://alexandervn.nl/2012/05/03/install-zeromq-php-ubuntu/](http://alexandervn.nl/2012/05/03/install-zeromq-php-ubuntu/)
 (May 2012)
 which installs ZeroMQ 2 on Ubuntu 11.10 and php 5.3.
-
-This tuto installs a ZeroMQ 4 on Debian Jessie, php7.
 
 
 ## Requirements

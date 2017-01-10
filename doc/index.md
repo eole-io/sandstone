@@ -1,5 +1,6 @@
 ---
 layout: page
+title: Sandstone | Websockets powered by PHP and Symfony
 ---
 
 <h2 class="no-margin-top">Introduction</h2>
