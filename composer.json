@@ -33,7 +33,8 @@
     },
     "require-dev": {
         "ekho/zmq-phpdoc": "1.0",
-        "phpunit/phpunit": "4.8.*",
+        "phpunit/phpunit": "4.x|5.x",
+        "silex/web-profiler": "2.x",
         "squizlabs/php_codesniffer": "2.x"
     },
     "repositories": [

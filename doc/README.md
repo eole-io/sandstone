@@ -36,6 +36,7 @@ git clone git@github.com:eole-io/sandstone.git --branch=dev
 cd sandstone/doc
 git fetch origin
 
+bundle install
 bundle exec jekyll build --destination /tmp/sandstone/
 cd ..
 git checkout gh-pages
@@ -43,7 +44,7 @@ rm -fr *
 mv /tmp/sandstone/* .
 rm Gemfile Gemfile.lock README.md
 git add -A
-git ci -m "Publish"
+git commit -m "Publish"
 git push origin gh-pages
 git checkout dev
 cd ..

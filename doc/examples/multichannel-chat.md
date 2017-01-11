@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Multichannel chat server with websockets
+title: Chat server with PHP and websockets
 ---
 
 <h1 class="no-margin-top">Multichannel chat server</h1>

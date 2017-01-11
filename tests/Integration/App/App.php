@@ -2,6 +2,8 @@
 
 namespace Eole\Sandstone\Tests\Integration\App;
 
+use Silex\Provider;
+use Eole\Sandstone\Push\Debug\PushServerProfilerServiceProvider;
 use Eole\Sandstone\Application;
 
 class App extends Application
@@ -24,6 +26,22 @@ class App extends Application
             'Eole\\Sandstone\\Tests\\App'
         );
 
+        $this->registerDebugProfiler();
+    }
+
+    private function registerDebugProfiler()
+    {
         $this->register(new \Eole\Sandstone\Push\ServiceProvider());
+
+        $this->register(new Provider\HttpFragmentServiceProvider());
+        $this->register(new Provider\ServiceControllerServiceProvider());
+        $this->register(new Provider\TwigServiceProvider());
+
+        $this->register(new Provider\WebProfilerServiceProvider(), array(
+            'profiler.cache_dir' => __DIR__.'/profiler',
+            'profiler.mount_prefix' => '/_profiler',
+        ));
+
+        $this->register(new PushServerProfilerServiceProvider());
     }
 }
