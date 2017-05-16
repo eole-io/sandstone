@@ -2,7 +2,7 @@
     "name":         "eole/sandstone",
     "license":      "MIT",
     "type":         "library",
-    "description":  "Extends Silex to easily mount a RestApi working together with a Websocket server through a Push server.",
+    "description":  "Silex RestApi with Websockets.",
     "homepage":     "https://eole-io.github.io/sandstone/",
     "keywords":     ["php", "symfony", "silex", "websocket", "push", "reactphp"],
     "authors": [
