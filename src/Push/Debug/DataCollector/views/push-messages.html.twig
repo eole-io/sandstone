@@ -1,7 +1,25 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% block toolbar %}
-    yo
+    {% set icon %}
+        <span class="sf-toolbar-value">
+            {{ collector.data.messages_count }}
+            Push
+        </span>
+    {% endset %}
+    {% set text %}
+        {% spaceless %}
+        <div class="sf-toolbar-info-piece">
+            <b>Push messages</b>
+            <span class="sf-toolbar-status">{{ collector.data.messages_count }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Total size</b>
+            <span class="sf-toolbar-status">{{ collector.data.messages_size }} bytes</span>
+        </div>
+        {% endspaceless %}
+    {% endset %}
+    {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': profiler_url } %}
 {% endblock %}
 
 {% block menu %}
