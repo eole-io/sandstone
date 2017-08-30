@@ -3,6 +3,7 @@
 namespace Eole\Sandstone\Websocket;
 
 use Psr\Log\LoggerAwareTrait;
+use JMS\Serializer\EventDispatcher\EventSubscriberInterface as WrongEventSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Ratchet\ConnectionInterface;
@@ -118,6 +119,14 @@ final class Application implements WampServerInterface
 
         if ($topic instanceof EventSubscriberInterface) {
             $this->sandstoneApplication['dispatcher']->addSubscriber($topic);
+        }
+
+        // debug purpose only. Sometimes I use the wrong namespace (JMS one), and it's hard to debug.
+        if ($topic instanceof WrongEventSubscriberInterface) {
+            throw new \LogicException(
+                get_class($topic).' seems to implements the wrong EventSubscriberInterface. '.
+                'Use the Symfony one, not the JMS one.'
+            );
         }
 
         return $topic;

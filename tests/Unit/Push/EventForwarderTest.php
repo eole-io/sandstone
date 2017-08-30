@@ -1,6 +1,6 @@
 <?php
 
-namespace Eole\Sandstone\Tests\Unit;
+namespace Eole\Sandstone\Tests\Unit\Push;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Eole\Sandstone\Push\PushServerInterface;
