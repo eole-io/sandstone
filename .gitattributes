@@ -6,3 +6,6 @@
 /phpunit.xml.dist   export-ignore
 /phpcs.xml          export-ignore
 /.scrutinizer.yml   export-ignore
+/Makefile           export-ignore
+/docker             export-ignore
+/docker-compose.yml export-ignore

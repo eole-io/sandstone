@@ -1,0 +1,8 @@
+version: '2'
+
+services:
+    php-fpm:
+        container_name: sandstone
+        build: docker/php-fpm
+        volumes:
+            - .:/var/www/html/
