@@ -21,7 +21,7 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
 
         $app['sandstone.websocket.router'] = function () {
             $wrongTopic = new WrongTopic('my-topic');
-            $topicRouterMock = $this->createMock(TopicRouter::class);
+            $topicRouterMock = $this->getMockBuilder(TopicRouter::class)->disableOriginalConstructor()->getMock();
 
             $topicRouterMock
                 ->method('loadTopic')
@@ -31,8 +31,10 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase
             return $topicRouterMock;
         };
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('WrongTopic seems to implements the wrong EventSubscriberInterface');
+        $this->setExpectedExceptionRegExp(
+            \LogicException::class,
+            '/WrongTopic seems to implements the wrong EventSubscriberInterface/'
+        );
 
         $method->invokeArgs($websocketApp, ['my-topic']);
     }
