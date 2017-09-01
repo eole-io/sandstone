@@ -12,11 +12,21 @@ use Eole\Sandstone\Push\ServiceProvider as PushServiceProvider;
 class Application extends BaseApplication
 {
     /**
+     * Events lists marked as to forward before application boot.
+     * Needs to be forwarded once application booted.
+     *
+     * @var string[][]
+     */
+    private $events;
+
+    /**
      * {@InheritDoc}
      */
     public function __construct(array $values = array())
     {
         parent::__construct($values);
+
+        $this->events = [];
 
         $this->fixAuthorizationHeader();
     }
@@ -100,8 +110,35 @@ class Application extends BaseApplication
             ));
         }
 
-        $this['sandstone.push.event_forwarder']->forwardAllEvents($eventsNames);
+        if ($this->booted) {
+            $this['sandstone.push.event_forwarder']->forwardAllEvents($eventsNames);
+        } else {
+            $this->events []= $eventsNames;
+        }
 
         return $this;
+    }
+
+    /**
+     * {@InheritDoc}
+     *
+     * Forward events marked as to be forwarded before application boot.
+     *
+     * Allow to use forwardEventsToPushServer in register
+     * instead of forcing user to forward event only at boot.
+     */
+    public function boot()
+    {
+        if ($this->booted) {
+            return;
+        }
+
+        parent::boot();
+
+        foreach ($this->events as $eventsNames) {
+            $this->forwardEventsToPushServer($eventsNames);
+        }
+
+        $this->events = [];
     }
 }
