@@ -10,6 +10,7 @@ use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
 use Eole\Sandstone\Logger\EchoLogger;
 use Eole\Sandstone\OAuth2\Security\Authentication\Token\OAuth2Token;
+use Eole\Sandstone\Websocket\Event\ConnectionEvent;
 use Eole\Sandstone\Application as SandstoneApplication;
 
 final class Application implements WampServerInterface
@@ -69,6 +70,8 @@ final class Application implements WampServerInterface
      */
     public function onOpen(ConnectionInterface $conn)
     {
+        $this->dispatch(ConnectionEvent::ON_OPEN, $conn);
+
         $this->logger->info('Connection event', ['event' => 'open']);
         $this->logger->info('Authentication...');
 
@@ -190,5 +193,16 @@ final class Application implements WampServerInterface
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
         $this->logger->info('Connection event', ['event' => 'error', 'message' => $e->getMessage()]);
+    }
+
+    /**
+     * Dispatch a ConnectionEvent to SandstoneApplication.
+     *
+     * @param string $event
+     * @param ConnectionInterface $conn
+     */
+    private function dispatch($event, ConnectionInterface $conn)
+    {
+        $this->sandstoneApplication['dispatcher']->dispatch($event, new ConnectionEvent($conn));
     }
 }
