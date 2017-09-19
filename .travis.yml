@@ -18,8 +18,6 @@ before_script:
     - if [ "$MODE" = "php" ]; then composer update; fi
 
 script:
-    - if [ "$MODE" = "docker" ]; then make; fi
-
-script:
     - if [ "$MODE" = "php" ]; then ./vendor/bin/phpcs --standard=phpcs.xml src; fi
     - if [ "$MODE" = "php" ]; then ./vendor/bin/phpunit -c .; fi
+    - if [ "$MODE" = "docker" ]; then make; fi
