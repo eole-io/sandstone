@@ -10,6 +10,12 @@ use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
 use Eole\Sandstone\Logger\EchoLogger;
 use Eole\Sandstone\OAuth2\Security\Authentication\Token\OAuth2Token;
+use Eole\Sandstone\Websocket\Event\ConnectionEvent;
+use Eole\Sandstone\Websocket\Event\WebsocketAuthenticationEvent;
+use Eole\Sandstone\Websocket\Event\ConnectionErrorEvent;
+use Eole\Sandstone\Websocket\Event\WampEvent;
+use Eole\Sandstone\Websocket\Event\PublishEvent;
+use Eole\Sandstone\Websocket\Event\RPCEvent;
 use Eole\Sandstone\Application as SandstoneApplication;
 
 final class Application implements WampServerInterface
@@ -69,6 +75,8 @@ final class Application implements WampServerInterface
      */
     public function onOpen(ConnectionInterface $conn)
     {
+        $this->dispatch(ConnectionEvent::ON_OPEN, new ConnectionEvent($conn));
+
         $this->logger->info('Connection event', ['event' => 'open']);
         $this->logger->info('Authentication...');
 
@@ -77,6 +85,7 @@ final class Application implements WampServerInterface
             if (null === $user) {
                 $this->logger->info('Anonymous connection');
             } else {
+                $this->dispatch(ConnectionEvent::ON_AUTHENTICATION, new WebsocketAuthenticationEvent($conn, $user));
                 $this->logger->info('User logged.', ['username' => $user->getUsername()]);
             }
         } catch (\Exception $e) {
@@ -137,6 +146,8 @@ final class Application implements WampServerInterface
      */
     public function onSubscribe(ConnectionInterface $conn, $topic)
     {
+        $this->dispatch(ConnectionEvent::ON_SUBSCRIBE, new WampEvent($conn, $topic));
+
         $this->logger->info('Topic event', ['event' => 'subscribe', 'topic' => $topic]);
 
         $this->getTopic($topic)->onSubscribe($conn, $topic);
@@ -147,6 +158,8 @@ final class Application implements WampServerInterface
      */
     public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible)
     {
+        $this->dispatch(ConnectionEvent::ON_PUBLISH, new PublishEvent($conn, $topic, $event, $exclude, $eligible));
+
         $this->logger->info('Topic event', ['event' => 'publish', 'topic' => $topic]);
 
         $this->getTopic($topic)->onPublish($conn, $topic, $event);
@@ -157,6 +170,8 @@ final class Application implements WampServerInterface
      */
     public function onUnSubscribe(ConnectionInterface $conn, $topic)
     {
+        $this->dispatch(ConnectionEvent::ON_UNSUBSCRIBE, new WampEvent($conn, $topic));
+
         $this->logger->info('Topic event', ['event' => 'unsubscribe', 'topic' => $topic]);
 
         $this->getTopic($topic)->onUnSubscribe($conn, $topic);
@@ -167,6 +182,8 @@ final class Application implements WampServerInterface
      */
     public function onClose(ConnectionInterface $conn)
     {
+        $this->dispatch(ConnectionEvent::ON_CLOSE, new ConnectionEvent($conn));
+
         $this->logger->info('Connection event', ['event' => 'close']);
 
         foreach ($this->topics as $topic) {
@@ -181,6 +198,8 @@ final class Application implements WampServerInterface
      */
     public function onCall(ConnectionInterface $conn, $id, $topic, array $params)
     {
+        $this->dispatch(ConnectionEvent::ON_RPC, new RPCEvent($conn, $topic, $id, $params));
+
         $this->logger->info('Topic event', ['event' => 'call', 'topic' => $topic]);
     }
 
@@ -189,6 +208,19 @@ final class Application implements WampServerInterface
      */
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
+        $this->dispatch(ConnectionEvent::ON_ERROR, new ConnectionErrorEvent($conn, $e));
+
         $this->logger->info('Connection event', ['event' => 'error', 'message' => $e->getMessage()]);
+    }
+
+    /**
+     * Dispatch a ConnectionEvent to SandstoneApplication dispatcher.
+     *
+     * @param string $eventName
+     * @param ConnectionEvent $event
+     */
+    private function dispatch($eventName, ConnectionEvent $event)
+    {
+        $this->sandstoneApplication['dispatcher']->dispatch($eventName, $event);
     }
 }
