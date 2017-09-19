@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Listen to websocket events</title>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://bootswatch.com/sandstone/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/sandstone/css/prism.css">
+        <link rel="stylesheet" href="/sandstone/css/all.css">
+    </head>
+    <body>
+        <nav class="navbar navbar-default navbar-fixed-top nav-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/sandstone/">Sandstone</a>
+
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a
+                    href="https://github.com/eole-io/sandstone"
+                    class="github-button"
+                    aria-label="Star eole-io/sandstone on GitHub"
+                    data-count-aria-label="# stargazers on GitHub"
+                    data-count-api="/repos/eole-io/sandstone#stargazers_count"
+                    data-count-href="/eole-io/sandstone/stargazers"
+                    data-style="mega"
+                >Star Sandstone</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
+        <div class="jumbotron">
+    <div class="container">
+        <h1>Sandstone</h1>
+        <p>Silex RestApi with Websockets.</p>
+        <a href="/sandstone/examples/full.html" class="btn btn-lg btn-primary">Get started</a>
+    </div>
+</div>
+
+<div class="container space-top">
+    <div class="row">
+        <div class="col-sm-3">
+            <nav class="nav nav-left">
+    <ul class="nav nav-pills nav-stacked">
+        <li 
+>
+            <a href="/sandstone/">
+                <i class="fa fa-home" aria-hidden="true"></i>
+                Home
+                <br>
+                <span>Introduction + Basic usage</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/examples/full.html">
+                <i class="fa fa-code" aria-hidden="true"></i>
+                Example: Full app
+                <br>
+                <span>RestApi + Websocket + Push</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/examples/multichannel-chat.html">
+                <i class="fa fa-code" aria-hidden="true"></i>
+                Example: Chat server
+                <br>
+                <span>Websocket</span>
+            </a>
+        </li>
+        <li class="active"
+>
+            <a href="/sandstone/websocket-events.html">
+                <i class="fa fa-wifi" aria-hidden="true"></i>
+                Listen websocket events
+                <br>
+                <span>onOpen, onClose, onPublish...</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/push-debug-profiler.html">
+                <i class="fa fa-list-alt" aria-hidden="true"></i>
+                Push debug profiler
+                <br>
+                <span>Enable that awesome debug tool !</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/under-the-hood.html">
+                <i class="fa fa-cogs" aria-hidden="true"></i>
+                Under the hood
+                <br>
+                <span>Used libraries</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/install-zmq-php-linux.html">
+                <i class="fa fa-archive" aria-hidden="true"></i>
+                ZMQ Linux installation
+                <br>
+                <span>and php binding</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+        </div>
+        <div class="col-sm-9">
+            <h1 class="no-margin-top">Listen to websocket events</h1>
+
+<p>At some point of your running websocket server,
+clients will connect and disconnect, and subscribe to a wamp topic to publish messages.</p>
+
+<p>You may need to do something when one of these event happens.</p>
+
+<p>Sandstone allows you to listen an event through the Silex event dispatcher.</p>
+
+<h2 id="which-event-i-can-listen-to">Which event I can listen to</h2>
+
+<p>All these events are dispatched:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Event</th>
+      <th>Event instance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="highlighter-rouge">ConnectionEvent::ON_OPEN</code></td>
+      <td><a href="https://github.com/eole-io/sandstone/blob/master/src/Websocket/Event/ConnectionEvent.php"><code class="highlighter-rouge">ConnectionEvent</code></a></td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">ConnectionEvent::ON_CLOSE</code></td>
+      <td><a href="https://github.com/eole-io/sandstone/blob/master/src/Websocket/Event/ConnectionEvent.php"><code class="highlighter-rouge">ConnectionEvent</code></a></td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">ConnectionEvent::ON_AUTHENTICATION</code></td>
+      <td><a href="https://github.com/eole-io/sandstone/blob/master/src/Websocket/Event/WebsocketAuthenticationEvent.php"><code class="highlighter-rouge">WebsocketAuthenticationEvent</code></a></td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">ConnectionEvent::ON_ERROR</code></td>
+      <td><a href="https://github.com/eole-io/sandstone/blob/master/src/Websocket/Event/ConnectionErrorEvent.php"><code class="highlighter-rouge">ConnectionErrorEvent</code></a></td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">ConnectionEvent::ON_SUBSCRIBE</code></td>
+      <td><a href="https://github.com/eole-io/sandstone/blob/master/src/Websocket/Event/WampEvent.php"><code class="highlighter-rouge">WampEvent</code></a></td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">ConnectionEvent::ON_UNSUBSCRIBE</code></td>
+      <td><a href="https://github.com/eole-io/sandstone/blob/master/src/Websocket/Event/WampEvent.php"><code class="highlighter-rouge">WampEvent</code></a></td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">ConnectionEvent::ON_PUBLISH</code></td>
+      <td><a href="https://github.com/eole-io/sandstone/blob/master/src/Websocket/Event/PublishEvent.php"><code class="highlighter-rouge">PublishEvent</code></a></td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">ConnectionEvent::ON_RPC</code></td>
+      <td><a href="https://github.com/eole-io/sandstone/blob/master/src/Websocket/Event/RPCEvent.php"><code class="highlighter-rouge">RPCEvent</code></a></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="details-of-events">Details of events</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Event</th>
+      <th>When is it called</th>
+      <th>What can I do with it</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="highlighter-rouge">ON_OPEN</code></td>
+      <td>Someone connects to websocket server</td>
+      <td>Retrieve some connection data with <code class="highlighter-rouge">$event-&gt;getConn()-&gt;Websocket</code></td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">ON_CLOSE</code></td>
+      <td>Someone closed websocket connection</td>
+      <td><em>same as below</em></td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">ON_AUTHENTICATION</code></td>
+      <td>Someone connected to websocket server and has been authenticated</td>
+      <td>Retrieve authenticated user with <code class="highlighter-rouge">$event-&gt;getUser()</code> (returns Symfony <code class="highlighter-rouge">UserInterface</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">ON_ERROR</code></td>
+      <td>An error has been triggered</td>
+      <td>Retrieve the raised exception with <code class="highlighter-rouge">$event-&gt;getError()</code> (Returns an <code class="highlighter-rouge">\Exception</code>)</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">ON_SUBSCRIBE</code></td>
+      <td>Someone subscribed to a topic</td>
+      <td>Know which topic has been subscribed with <code class="highlighter-rouge">$event-&gt;getTopic()</code></td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">ON_UNSUBSCRIBE</code></td>
+      <td>Someone unsubscribed to a topic</td>
+      <td><em>same with unsubscription</em></td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">ON_PUBLISH</code></td>
+      <td>Someone published a message to a topic</td>
+      <td>Listen to published messages on topics with <code class="highlighter-rouge">$event-&gt;getEvent()</code> to get message, <code class="highlighter-rouge">$event-&gt;getTopic()</code> to get topic</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">ON_RPC</code></td>
+      <td>Remote procedure call</td>
+      <td>Retrieve remote procedure call ID and parameters with <code class="highlighter-rouge">$event-&gt;getId()</code> and <code class="highlighter-rouge">$event-&gt;getParams()</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="listen-to-websocket-events">Listen to websocket events</h2>
+
+<p>I want to do something when someone connects to websocket server.</p>
+
+<ul>
+  <li>First, create the listener</li>
+</ul>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\EventDispatcher\EventSubscriberInterface</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Eole\Sandstone\Websocket\Event\ConnectionEvent</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">MyWebsocketListener</span> <span class="k">implements</span> <span class="nx">EventSubscriberInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">getSubscribedEvents</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="nx">ConnectionEvent</span><span class="o">::</span><span class="na">ON_OPEN</span> <span class="o">=&gt;</span> <span class="s1">'onOpen'</span><span class="p">,</span>
+        <span class="p">];</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">onOpen</span><span class="p">(</span><span class="nx">ConnectionEvent</span> <span class="nv">$event</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// do something when someone connects
+</span>
+        <span class="c1">// retrieve some connection data with $event-&gt;getConn()-&gt;Websocket;
+</span>        <span class="c1">// which returns a ConnectionInterface from RatchetPHP
+</span>    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<ul>
+  <li>Then, register this listener as a Silex <code class="highlighter-rouge">EventListenerProviderInterface</code></li>
+</ul>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\EventDispatcher\EventDispatcherInterface</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Pimple\Container</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Silex\Api\EventListenerProviderInterface</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">MyProvider</span> <span class="k">implements</span> <span class="nx">EventListenerProviderInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">subscribe</span><span class="p">(</span><span class="nx">Container</span> <span class="nv">$app</span><span class="p">,</span> <span class="nx">EventDispatcherInterface</span> <span class="nv">$dispatcher</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">addSubscriber</span><span class="p">(</span><span class="k">new</span> <span class="nx">MyWebsocketListener</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<h2 id="another-example-listen-to-published-messages">Another example: listen to published messages</h2>
+
+<p>I want to display (for debugging purpose) all published messages in any topic.</p>
+
+<p>I have to listen to the <code class="highlighter-rouge">ConnectionEvent::ON_PUBLISH</code> event:</p>
+
+<ul>
+  <li>First, create the listener</li>
+</ul>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\EventDispatcher\EventSubscriberInterface</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Eole\Sandstone\Websocket\Event\ConnectionEvent</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Eole\Sandstone\Websocket\Event\PublishEvent</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">MyMessagePublishListener</span> <span class="k">implements</span> <span class="nx">EventSubscriberInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">getSubscribedEvents</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="nx">ConnectionEvent</span><span class="o">::</span><span class="na">ON_PUBLISH</span> <span class="o">=&gt;</span> <span class="s1">'onMessagePublish'</span><span class="p">,</span>
+        <span class="p">];</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">onMessagePublish</span><span class="p">(</span><span class="nx">PublishEvent</span> <span class="nv">$event</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$message</span> <span class="o">=</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getEvent</span><span class="p">();</span>
+        <span class="nv">$topic</span> <span class="o">=</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getTopic</span><span class="p">();</span>
+
+        <span class="k">echo</span> <span class="s2">"'</span><span class="nv">$message</span><span class="s2">' has been published in '</span><span class="nv">$topic</span><span class="s2">'"</span><span class="p">,</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<ul>
+  <li>Then, register this listener</li>
+</ul>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Symfony\Component\EventDispatcher\EventDispatcherInterface</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Pimple\Container</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Silex\Api\EventListenerProviderInterface</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">MyProvider</span> <span class="k">implements</span> <span class="nx">EventListenerProviderInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">subscribe</span><span class="p">(</span><span class="nx">Container</span> <span class="nv">$app</span><span class="p">,</span> <span class="nx">EventDispatcherInterface</span> <span class="nv">$dispatcher</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">addSubscriber</span><span class="p">(</span><span class="k">new</span> <span class="nx">MyMessagePublishListener</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>It should display in your websocket logs something like:</p>
+
+<p><code class="highlighter-rouge">'Hello world' has been published in 'general/chat'</code></p>
+
+<h2 id="event-class-diagram">Event class diagram</h2>
+
+<p>Here is the events diagram, all attributes are inherited:</p>
+
+<p><img src="img/events-dcm.png" alt="Sandstone websocket events DCM" class="img-responsive img-thumbnail" /></p>
+
+        </div>
+    </div>
+</div>
+
+
+        <footer>
+    <div class="container-fluid">
+        <div class="text-center">
+            <p>Sandstone is under <a href="https://github.com/eole-io/sandstone/blob/master/LICENSE">MIT license</a>.</p>
+            <br />
+            <p>
+                Find me here:
+                <br />
+                <a href="https://github.com/alcalyn">
+                    <i class="fa fa-github fa-lg" aria-hidden="true"></i>
+                    alcalyn
+                </a>
+                -
+                <a href="https://twitter.com/alcalyn_">
+                    <i class="fa fa-twitter fa-lg" aria-hidden="true"></i>
+                    alcalyn_
+                </a>
+            </p>
+        </div>
+    </div>
+</footer>
+
+
+        <script async defer src="https://buttons.github.io/buttons.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="/sandstone/js/prism.js"></script>
+    </body>
+</html>
