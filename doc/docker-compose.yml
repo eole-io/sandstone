@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+    jekyll:
+        build: docker/jekyll
+        container_name: sandstone-doc-jekyll
+        volumes:
+            - ..:/var/www/sandstone
+        working_dir: /var/www/sandstone/doc
+        ports:
+            - 4000:4000
+        command: bash -c "bundle install && bundle exec jekyll serve --host=0.0.0.0"
