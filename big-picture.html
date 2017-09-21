@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Sandstone | Websockets powered by PHP and Symfony</title>
+        <title>Big picture</title>
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://bootswatch.com/sandstone/bootstrap.min.css">
@@ -48,7 +48,7 @@
         <div class="col-sm-3">
             <nav class="nav nav-left">
     <ul class="nav nav-pills nav-stacked">
-        <li class="active"
+        <li 
 >
             <a href="/sandstone/">
                 <i class="fa fa-home" aria-hidden="true"></i>
@@ -93,7 +93,7 @@
                 <span>Enable that awesome debug tool !</span>
             </a>
         </li>
-        <li 
+        <li class="active"
 >
             <a href="/sandstone/big-picture.html">
                 <i class="fa fa-picture-o" aria-hidden="true"></i>
@@ -125,114 +125,69 @@
 
         </div>
         <div class="col-sm-9">
-            <h2 class="no-margin-top">Introduction</h2>
+            <h1 class="no-margin-top">Big picture</h1>
 
-<p>If you want to build a PHP application with real-time stuff,
-this library can help you to use websockets in a structured application.</p>
+<p>Sandstone runs a RestApi server and a Websocket server.</p>
 
-<p>What you can achieve with Sandstone:</p>
+<p>This is two stacks, running on a different processus.
+The big picture show all stacks components, and list all steps
+in a standard use case, a RestApi request that triggers a Push event.</p>
 
-<ul>
-  <li>Create a Rest Api using Silex (Sandstone extends Silex)</li>
-  <li>Create a websocket topic the same way as creating an api endpoint</li>
-  <li>Dispatch event from Rest Api to Websocket server using Symfony event dispatcher</li>
-</ul>
+<p><img src="img/sandstone-big-picture.png" alt="Sandstone big picture" class="img-responsive" /></p>
 
-<h2 id="installation">Installation</h2>
+<h3 id="step-0">Step 0</h3>
 
-<p>Sandstone needs:</p>
+<p>Javascript client open a connection to websocket server.
+It then subscribes to <code class="highlighter-rouge">articles</code> topic in order to receive
+all new published articles as soon as someone posted one.</p>
 
-<ul>
-  <li>PHP &gt;= 5.5</li>
-  <li>ZMQ and ZMQ php extension (or see <a href="/sandstone/install-zmq-php-linux.html">Install ZMQ and php-zmq on Linux</a>)</li>
-</ul>
+<blockquote>
+  <p>See <code class="highlighter-rouge">ChatTopic</code> class, or Javascript client implementation example in
+<a href="/sandstone/examples/multichannel-chat.html">Full example</a>.</p>
+</blockquote>
 
-<p>Sandstone is on composer (<a href="https://packagist.org/packages/eole/sandstone">eole/sandstone</a>).
-Installation using composer:</p>
+<h3 id="step-1">Step 1</h3>
 
-<pre class="command-line" data-prompt="$"><code class="language-bash">composer require eole/sandstone</code></pre>
+<p>A web client creates a new article. He then POST it to RestApi server.</p>
 
-<h2 id="usage">Usage</h2>
+<h3 id="step-2">Step 2</h3>
 
-<h3 id="create-a-websocket-topic">Create a websocket topic</h3>
+<p>Nginx handle the HTTP request, and aks for php-fpm to execute PHP application
+to return processed result.</p>
 
-<div class="language-php highlighter-rouge"><pre class="highlight"><code>$app = new Eole\Sandstone\Application();
+<h3 id="step-3">Step 3</h3>
 
-$app-&gt;topic('chat/{channel}', function ($topicPattern, $arguments) {
-    $channelName = $arguments['channel'];
+<p>PHP runs the application. In Sandstone, it means:
+ - solve the route,
+ - execute the ArticleController
+ - persist the article in database
+ - dispatch an <code class="highlighter-rouge">ARTICLE_CREATED</code> event through the Event Dispatcher</p>
 
-    return new ChatTopic($topicPattern, $channelName);
-});
-</code></pre>
-</div>
+<h3 id="step-4">Step 4</h3>
 
-<h3 id="dispatch-an-event-from-rest-api-to-a-websocket-server-topic">Dispatch an event from rest api to a websocket server topic</h3>
+<p>If the <code class="highlighter-rouge">ARTICLE_CREATED</code> evnt has been marked as <em>forward</em> with
+<code class="highlighter-rouge">$app-&gt;forwardEventToPushServer('article.created');</code>,
+Sandstone will automagically forward it to the websocket server process.</p>
 
-<p>In rest api stack:</p>
+<p>The magic trick here is to use a ZMQ socket. Then Sandstone serialize the event,
+send it through the ZMQ socket. The websocket process then deserialize it,
+and dispatch it in his Event dispatcher.</p>
 
-<div class="language-php highlighter-rouge"><pre class="highlight"><code>use Symfony\Component\HttpFoundation\Response;
+<h3 id="step-5">Step 5</h3>
 
-$app = new Eole\Sandstone\Application();
+<p>Your <code class="highlighter-rouge">ArticlesTopic</code>, which is listening to the <code class="highlighter-rouge">ARTICLE_CREATED</code>,
+calls the listener. This listener will JSON serialize and <code class="highlighter-rouge">broadcast</code> the event
+to the <code class="highlighter-rouge">articles</code> websocket topic.</p>
 
-// Creating an api endpoint at POST api/articles
-$app-&gt;post('api/articles', function () use ($app) {
-    $event = new ArticleEvent();
+<blockquote>
+  <p>See <code class="highlighter-rouge">ChatTopic</code> class to see how to listen to event:
+<a href="/sandstone/examples/multichannel-chat.html">Full example</a>.</p>
+</blockquote>
 
-    $event-&gt;title = 'Unicorns spotted in Alaska';
+<h3 id="step-6">Step 6</h3>
 
-    // Dispatch an event on article creation
-    $app['dispatcher']-&gt;dispatch('article.created', $event);
-
-    return new Response([], 201);
-});
-
-// Send all 'article.created' events to push server
-$app-&gt;forwardEventToPushServer('article.created');
-</code></pre>
-</div>
-
-<p>In websocket server stack:</p>
-
-<div class="language-php highlighter-rouge"><pre class="highlight"><code>use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-class MyWebsocketTopic extends Eole\Sandstone\Websocket\Topic implements EventSubscriberInterface
-{
-    public static function getSubscribedEvents()
-    {
-        return [
-            'article.created' =&gt; 'onArticleCreated',
-        ];
-    }
-
-    public function onArticleCreated(ArticleEvent $event)
-    {
-        // Broadcast message on this topic when an article has been created.
-        $this-&gt;broadcast([
-            'message' =&gt; 'An article has just been published: '.$event-&gt;title,
-        ]);
-    }
-}
-</code></pre>
-</div>
-
-<h3 id="full-working-examples">Full working examples</h3>
-
-<p>See what you can do with examples:</p>
-
-<ul>
-  <li><a href="/sandstone/examples/full.html">Full example of a rest api working with a websocket server</a></li>
-  <li><a href="/sandstone/examples/multichannel-chat.html">Multichannel chat server</a></li>
-</ul>
-
-<h4 id="docker">Docker</h4>
-
-<p>A full example of a Sandstone application also exists as a Docker image.</p>
-
-<p>Check it on Bitbucket: <a href="https://bitbucket.org/zareba_pawel/php-websockets-sandstone">zareba_pawel/php-websockets-sandstone</a></p>
-
-<h2 id="license">License</h2>
-
-<p>Sandstone is under <a href="https://github.com/eole-io/sandstone/blob/master/LICENSE">MIT license</a>.</p>
+<p>The Javascript client, which subscribed to <code class="highlighter-rouge">articles</code> topic,
+receives the JSON serialized event.</p>
 
         </div>
     </div>
