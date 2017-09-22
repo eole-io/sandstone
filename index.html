@@ -133,9 +133,9 @@ this library can help you to use websockets in a structured application.</p>
 <p>What you can achieve with Sandstone:</p>
 
 <ul>
-  <li>Create a Rest Api using Silex (Sandstone extends Silex)</li>
+  <li>Create a Rest Api</li>
   <li>Create a websocket topic the same way as creating an api endpoint</li>
-  <li>Dispatch event from Rest Api to Websocket server using Symfony event dispatcher</li>
+  <li>Dispatch event from Rest Api to Websocket server</li>
 </ul>
 
 <h2 id="installation">Installation</h2>
@@ -156,6 +156,8 @@ Installation using composer:</p>
 
 <h3 id="create-a-websocket-topic">Create a websocket topic</h3>
 
+<p>Declare a websocket topic just as easy as declaring a silex route:</p>
+
 <div class="language-php highlighter-rouge"><pre class="highlight"><code>$app = new Eole\Sandstone\Application();
 
 $app-&gt;topic('chat/{channel}', function ($topicPattern, $arguments) {
@@ -166,7 +168,15 @@ $app-&gt;topic('chat/{channel}', function ($topicPattern, $arguments) {
 </code></pre>
 </div>
 
-<h3 id="dispatch-an-event-from-rest-api-to-a-websocket-server-topic">Dispatch an event from rest api to a websocket server topic</h3>
+<blockquote>
+  <p>See more in the
+<a href="/sandstone/examples/multichannel-chat.html">Multichannel chat server example</a>.</p>
+</blockquote>
+
+<h3 id="send-push-notifications-from-restapi">Send push notifications from RestApi</h3>
+
+<p>To send push notifications to web clients
+when someone update a resource through the RestApi.</p>
 
 <p>In rest api stack:</p>
 
@@ -215,16 +225,43 @@ class MyWebsocketTopic extends Eole\Sandstone\Websocket\Topic implements EventSu
 </code></pre>
 </div>
 
-<h3 id="full-working-examples">Full working examples</h3>
+<blockquote>
+  <p>See more in the
+<a href="/sandstone/examples/full.html">Full example</a>.</p>
+</blockquote>
+
+<h2 id="sandstone-edition">Sandstone edition</h2>
+
+<p>If you want to start a new project or a real-time RestApi,
+you may consider using <a href="https://github.com/eole-io/sandstone-edition">Sandstone edition</a>.</p>
+
+<p>This edition is a starter project with:</p>
+
+<ul>
+  <li><a href="https://eole-io.github.io/sandstone/">Sandstone</a> (Silex with websockets)</li>
+  <li><strong>Docker</strong> environment to mount the whole application (RestApi, websocket server, MariaDB, PHPMyAdmin)</li>
+  <li><strong>Doctrine ORM</strong> and Doctrine commands</li>
+  <li><strong>Symfony web profiler</strong> for debugging RestApi requests and Push events</li>
+  <li><a href="https://github.com/danadesrosiers/silex-annotation-provider">Silex annotations</a> for controllers and routing annotations</li>
+</ul>
+
+<p>It’s for people who will need a real-time RestApi with a database and an ORM, debug tools,
+and don’t want to install all these tools and initiate the project structure (controllers, entities…).</p>
+
+<p>It also has a Docker environment, so that you can install and run the app easily.</p>
+
+<p>Check it out: <i class="fa fa-github fa-lg" aria-hidden="true"></i> <a href="https://github.com/eole-io/sandstone-edition">Sandstone edition</a></p>
+
+<h2 id="full-working-examples">Full working examples</h2>
 
 <p>See what you can do with examples:</p>
 
 <ul>
-  <li><a href="/sandstone/examples/full.html">Full example of a rest api working with a websocket server</a></li>
-  <li><a href="/sandstone/examples/multichannel-chat.html">Multichannel chat server</a></li>
+  <li><i class="fa fa-code" aria-hidden="true"></i> <a href="/sandstone/examples/full.html">Full example of a rest api working with a websocket server</a></li>
+  <li><i class="fa fa-code" aria-hidden="true"></i> <a href="/sandstone/examples/multichannel-chat.html">Multichannel chat server</a></li>
 </ul>
 
-<h4 id="docker">Docker</h4>
+<h3 id="docker">Docker</h3>
 
 <p>A full example of a Sandstone application also exists as a Docker image.</p>
 
@@ -240,23 +277,55 @@ class MyWebsocketTopic extends Eole\Sandstone\Websocket\Topic implements EventSu
 
 
         <footer>
-    <div class="container-fluid">
-        <div class="text-center">
-            <p>Sandstone is under <a href="https://github.com/eole-io/sandstone/blob/master/LICENSE">MIT license</a>.</p>
-            <br />
-            <p>
-                Find me here:
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4 text-center">
+                <p>Sandstone is under <a href="https://github.com/eole-io/sandstone/blob/master/LICENSE">MIT license</a>.</p>
                 <br />
-                <a href="https://github.com/alcalyn">
-                    <i class="fa fa-github fa-lg" aria-hidden="true"></i>
-                    alcalyn
-                </a>
-                -
-                <a href="https://twitter.com/alcalyn_">
-                    <i class="fa fa-twitter fa-lg" aria-hidden="true"></i>
-                    alcalyn_
-                </a>
-            </p>
+
+                <ul class="list-unstyled">
+                    <li>
+                        <i class="fa fa-github fa-lg" aria-hidden="true"></i>
+                        <a href="https://github.com/eole-io/sandstone">Sandstone</a>
+                    </li>
+                    <li>
+                        <i class="fa fa-github fa-lg" aria-hidden="true"></i>
+                        <a href="https://github.com/eole-io/sandstone-edition">Sandstone edition</a>
+                    </li>
+                </ul>
+                <br />
+
+                <p>
+                    Follow updates and news:
+                    <br />
+                    <a
+                        href="https://twitter.com/sandstone_php"
+                        class="twitter-follow-button"
+                        data-size="large"
+                        data-show-count="false"
+                    >Follow @sandstone_php</a>
+                    <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+                </p>
+                <br />
+
+                <p>
+                    Find me here:
+                    <br />
+                    <a href="https://github.com/alcalyn">
+                        <i class="fa fa-github fa-lg" aria-hidden="true"></i>
+                        alcalyn
+                    </a>
+                    -
+                    <a href="https://twitter.com/alcalyn_">
+                        <i class="fa fa-twitter fa-lg" aria-hidden="true"></i>
+                        alcalyn_
+                    </a>
+                </p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class='jekyll-twitter-plugin'><a class="twitter-timeline" data-width="400" data-tweet-limit="2" href="https://twitter.com/sandstone_php">Tweets by sandstone_php</a>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>
+            </div>
         </div>
     </div>
 </footer>

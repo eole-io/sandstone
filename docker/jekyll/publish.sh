@@ -20,6 +20,9 @@ mv /tmp/sandstone-build/* .
 rm Gemfile Gemfile.lock README.md
 git add -A
 git commit -m "Publish"
+echo "---"
+echo "Password: generate access token from: https://github.com/settings/tokens"
+echo "---"
 git push origin gh-pages
 cd /
 

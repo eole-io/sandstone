@@ -127,17 +127,17 @@
         <div class="col-sm-9">
             <h1 class="no-margin-top">Big picture</h1>
 
-<p>Sandstone runs a RestApi server and a Websocket server.</p>
+<p>Sandstone runs a RestApi server and a Websocket server.
+Two stacks, running on differents processus.</p>
 
-<p>This is two stacks, running on a different processus.
-The big picture show all stacks components, and list all steps
-in a standard use case, a RestApi request that triggers a Push event.</p>
+<p>This big picture show all Sandstone components, and list all steps
+in a standard use case, a RestApi request which triggers a Push event.</p>
 
 <p><img src="img/sandstone-big-picture.png" alt="Sandstone big picture" class="img-responsive" /></p>
 
 <h3 id="step-0">Step 0</h3>
 
-<p>Javascript client open a connection to websocket server.
+<p>Javascript client opens a connection to websocket server.
 It then subscribes to <code class="highlighter-rouge">articles</code> topic in order to receive
 all new published articles as soon as someone posted one.</p>
 
@@ -148,35 +148,41 @@ all new published articles as soon as someone posted one.</p>
 
 <h3 id="step-1">Step 1</h3>
 
-<p>A web client creates a new article. He then POST it to RestApi server.</p>
+<p>A web client creates a new article. He then POST it to the RestApi server.</p>
 
 <h3 id="step-2">Step 2</h3>
 
-<p>Nginx handle the HTTP request, and aks for php-fpm to execute PHP application
+<p>Nginx handle the HTTP request, and asks for php-fpm to execute PHP application.
 to return processed result.</p>
 
 <h3 id="step-3">Step 3</h3>
 
-<p>PHP runs the application. In Sandstone, it means:
- - solve the route,
- - execute the ArticleController
- - persist the article in database
- - dispatch an <code class="highlighter-rouge">ARTICLE_CREATED</code> event through the Event Dispatcher</p>
+<p>PHP runs the application. In Sandstone, it means:</p>
+
+<ul>
+  <li>solve the <code class="highlighter-rouge">POST /articles</code> route,</li>
+  <li>execute the <code class="highlighter-rouge">ArticleController</code>,</li>
+  <li>persist the article in database,</li>
+  <li>dispatch an <code class="highlighter-rouge">ARTICLE_CREATED</code> event through the Event Dispatcher.</li>
+</ul>
 
 <h3 id="step-4">Step 4</h3>
 
-<p>If the <code class="highlighter-rouge">ARTICLE_CREATED</code> evnt has been marked as <em>forward</em> with
-<code class="highlighter-rouge">$app-&gt;forwardEventToPushServer('article.created');</code>,
-Sandstone will automagically forward it to the websocket server process.</p>
+<p>If the <code class="highlighter-rouge">ARTICLE_CREATED</code> event has been marked as <em>forward</em> with
+<code class="highlighter-rouge">$app-&gt;forwardEventToPushServer('ARTICLE_CREATED');</code>,
+Sandstone will <em>automagically</em> forward it to the websocket server process.</p>
 
-<p>The magic trick here is to use a ZMQ socket. Then Sandstone serialize the event,
+<p>The magic trick here is to use a ZMQ socket. Sandstone serialize the event,
 send it through the ZMQ socket. The websocket process then deserialize it,
 and dispatch it in his Event dispatcher.</p>
 
+<p>By this way, dispatching an event in the RestApi stack
+can be listened in the websocket stack.</p>
+
 <h3 id="step-5">Step 5</h3>
 
-<p>Your <code class="highlighter-rouge">ArticlesTopic</code>, which is listening to the <code class="highlighter-rouge">ARTICLE_CREATED</code>,
-calls the listener. This listener will JSON serialize and <code class="highlighter-rouge">broadcast</code> the event
+<p>Your <code class="highlighter-rouge">ArticleTopic</code>, which is listening to the <code class="highlighter-rouge">ARTICLE_CREATED</code> event,
+calls the listener. This listener will JSON serialize the article, and <code class="highlighter-rouge">broadcast</code> the event
 to the <code class="highlighter-rouge">articles</code> websocket topic.</p>
 
 <blockquote>
@@ -186,8 +192,12 @@ to the <code class="highlighter-rouge">articles</code> websocket topic.</p>
 
 <h3 id="step-6">Step 6</h3>
 
-<p>The Javascript client, which subscribed to <code class="highlighter-rouge">articles</code> topic,
+<p>The Javascript client, which earlier (step 0) subscribed to the <code class="highlighter-rouge">articles</code> websocket topic,
 receives the JSON serialized event.</p>
+
+<p>It can use this event to real-time display a notification
+that a new article has been posted,
+or dynamically add it to the DOM.</p>
 
         </div>
     </div>
@@ -195,23 +205,55 @@ receives the JSON serialized event.</p>
 
 
         <footer>
-    <div class="container-fluid">
-        <div class="text-center">
-            <p>Sandstone is under <a href="https://github.com/eole-io/sandstone/blob/master/LICENSE">MIT license</a>.</p>
-            <br />
-            <p>
-                Find me here:
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4 text-center">
+                <p>Sandstone is under <a href="https://github.com/eole-io/sandstone/blob/master/LICENSE">MIT license</a>.</p>
                 <br />
-                <a href="https://github.com/alcalyn">
-                    <i class="fa fa-github fa-lg" aria-hidden="true"></i>
-                    alcalyn
-                </a>
-                -
-                <a href="https://twitter.com/alcalyn_">
-                    <i class="fa fa-twitter fa-lg" aria-hidden="true"></i>
-                    alcalyn_
-                </a>
-            </p>
+
+                <ul class="list-unstyled">
+                    <li>
+                        <i class="fa fa-github fa-lg" aria-hidden="true"></i>
+                        <a href="https://github.com/eole-io/sandstone">Sandstone</a>
+                    </li>
+                    <li>
+                        <i class="fa fa-github fa-lg" aria-hidden="true"></i>
+                        <a href="https://github.com/eole-io/sandstone-edition">Sandstone edition</a>
+                    </li>
+                </ul>
+                <br />
+
+                <p>
+                    Follow updates and news:
+                    <br />
+                    <a
+                        href="https://twitter.com/sandstone_php"
+                        class="twitter-follow-button"
+                        data-size="large"
+                        data-show-count="false"
+                    >Follow @sandstone_php</a>
+                    <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+                </p>
+                <br />
+
+                <p>
+                    Find me here:
+                    <br />
+                    <a href="https://github.com/alcalyn">
+                        <i class="fa fa-github fa-lg" aria-hidden="true"></i>
+                        alcalyn
+                    </a>
+                    -
+                    <a href="https://twitter.com/alcalyn_">
+                        <i class="fa fa-twitter fa-lg" aria-hidden="true"></i>
+                        alcalyn_
+                    </a>
+                </p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class='jekyll-twitter-plugin'><a class="twitter-timeline" data-width="400" data-tweet-limit="2" href="https://twitter.com/sandstone_php">Tweets by sandstone_php</a>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>
+            </div>
         </div>
     </div>
 </footer>
