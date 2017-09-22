@@ -10,9 +10,9 @@ this library can help you to use websockets in a structured application.
 
 What you can achieve with Sandstone:
 
-- Create a Rest Api using Silex (Sandstone extends Silex)
+- Create a Rest Api
 - Create a websocket topic the same way as creating an api endpoint
-- Dispatch event from Rest Api to Websocket server using Symfony event dispatcher
+- Dispatch event from Rest Api to Websocket server
 
 
 ## Installation
@@ -33,6 +33,8 @@ Installation using composer:
 
 ### Create a websocket topic
 
+Declare a websocket topic just as easy as declaring a silex route:
+
 ``` php
 $app = new Eole\Sandstone\Application();
 
@@ -43,8 +45,14 @@ $app->topic('chat/{channel}', function ($topicPattern, $arguments) {
 });
 ```
 
+> See more in the
+> [Multichannel chat server example]({{ site.baseurl }}/examples/multichannel-chat.html).
 
-### Dispatch an event from rest api to a websocket server topic
+
+### Send push notifications from RestApi
+
+To send push notifications to web clients
+when someone update a resource through the RestApi.
 
 In rest api stack:
 
@@ -93,16 +101,40 @@ class MyWebsocketTopic extends Eole\Sandstone\Websocket\Topic implements EventSu
 }
 ```
 
+> See more in the
+> [Full example]({{ site.baseurl }}/examples/full.html).
 
-### Full working examples
+
+## Sandstone edition
+
+If you want to start a new project or a real-time RestApi,
+you may consider using [Sandstone edition](https://github.com/eole-io/sandstone-edition).
+
+This edition is a starter project with:
+
+ - [Sandstone](https://eole-io.github.io/sandstone/) (Silex with websockets)
+ - **Docker** environment to mount the whole application (RestApi, websocket server, MariaDB, PHPMyAdmin)
+ - **Doctrine ORM** and Doctrine commands
+ - **Symfony web profiler** for debugging RestApi requests and Push events
+ - [Silex annotations](https://github.com/danadesrosiers/silex-annotation-provider) for controllers and routing annotations
+
+It's for people who will need a real-time RestApi with a database and an ORM, debug tools,
+and don't want to install all these tools and initiate the project structure (controllers, entities...).
+
+It also has a Docker environment, so that you can install and run the app easily.
+
+Check it out: <i class="fa fa-github fa-lg" aria-hidden="true"></i> [Sandstone edition](https://github.com/eole-io/sandstone-edition)
+
+
+## Full working examples
 
 See what you can do with examples:
 
-- [Full example of a rest api working with a websocket server]({{ site.baseurl }}/examples/full.html)
-- [Multichannel chat server]({{ site.baseurl }}/examples/multichannel-chat.html)
+- <i class="fa fa-code" aria-hidden="true"></i> [Full example of a rest api working with a websocket server]({{ site.baseurl }}/examples/full.html)
+- <i class="fa fa-code" aria-hidden="true"></i> [Multichannel chat server]({{ site.baseurl }}/examples/multichannel-chat.html)
 
 
-#### Docker
+### Docker
 
 A full example of a Sandstone application also exists as a Docker image.
 
