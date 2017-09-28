@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Sandstone | Websockets powered by PHP and Symfony</title>
+        <title>Topic route parameters</title>
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://bootswatch.com/sandstone/bootstrap.min.css">
@@ -48,7 +48,7 @@
         <div class="col-sm-3">
             <nav class="nav nav-left">
     <ul class="nav nav-pills nav-stacked">
-        <li class="active"
+        <li 
 >
             <a href="/sandstone/">
                 <i class="fa fa-home" aria-hidden="true"></i>
@@ -75,7 +75,7 @@
                 <span>Websocket</span>
             </a>
         </li>
-        <li 
+        <li class="active"
 >
             <a href="/sandstone/topic-route-parameters.html">
                 <i class="fa fa-sitemap" aria-hidden="true"></i>
@@ -134,151 +134,168 @@
 
         </div>
         <div class="col-sm-9">
-            <h2 class="no-margin-top">Introduction</h2>
+            <h1 class="no-margin-top">Topic route parameters</h1>
 
-<p>If you want to build a PHP application with real-time stuff,
-this library can help you to use websockets in a structured application.</p>
+<p>Declaring a single websocket topic with Sandstone is like:</p>
 
-<p>What you can achieve with Sandstone:</p>
-
-<ul>
-  <li>Create a Rest Api</li>
-  <li>Create a websocket topic the same way as creating an api endpoint</li>
-  <li>Dispatch event from Rest Api to Websocket server</li>
-</ul>
-
-<h2 id="installation">Installation</h2>
-
-<p>Sandstone needs:</p>
-
-<ul>
-  <li>PHP &gt;= 5.5</li>
-  <li>ZMQ and ZMQ php extension (or see <a href="/sandstone/install-zmq-php-linux.html">Install ZMQ and php-zmq on Linux</a>)</li>
-</ul>
-
-<p>Sandstone is on composer (<a href="https://packagist.org/packages/eole/sandstone">eole/sandstone</a>).
-Installation using composer:</p>
-
-<pre class="command-line" data-prompt="$"><code class="language-bash">composer require eole/sandstone</code></pre>
-
-<h2 id="usage">Usage</h2>
-
-<h3 id="create-a-websocket-topic">Create a websocket topic</h3>
-
-<p>Declare a websocket topic just as easy as declaring a silex route:</p>
-
-<div class="language-php highlighter-rouge"><pre class="highlight"><code>$app = new Eole\Sandstone\Application();
-
-$app-&gt;topic('chat/{channel}', function ($topicPattern, $arguments) {
-    $channelName = $arguments['channel'];
-
-    return new ChatTopic($topicPattern, $channelName);
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>$app-&gt;topic('chat/general', function ($topicPattern) {
+    return new ChatTopic($topicPattern);
 });
 </code></pre>
 </div>
 
 <blockquote>
-  <p>See more in the
-<a href="/sandstone/examples/multichannel-chat.html">Multichannel chat server example</a>.</p>
+  <p><strong>Note</strong>: <code class="highlighter-rouge">$app</code> is your Sandstone application instance,
+created with <code class="highlighter-rouge">$app = new Eole\Sandstone\Application()</code>.</p>
+
+  <p>See <a href="/sandstone/examples/full.html">Full example of Sandstone application</a>
+to have an example to how to bootstrap a Sandstone application.</p>
 </blockquote>
 
-<h3 id="send-push-notifications-from-restapi">Send push notifications from RestApi</h3>
+<p>With the following <code class="highlighter-rouge">ChatTopic</code> class:</p>
 
-<p>To send push notifications to web clients
-when someone update a resource through the RestApi.</p>
-
-<p>In rest api stack:</p>
-
-<div class="language-php highlighter-rouge"><pre class="highlight"><code>use Symfony\Component\HttpFoundation\Response;
-
-$app = new Eole\Sandstone\Application();
-
-// Creating an api endpoint at POST api/articles
-$app-&gt;post('api/articles', function () use ($app) {
-    $event = new ArticleEvent();
-
-    $event-&gt;title = 'Unicorns spotted in Alaska';
-
-    // Dispatch an event on article creation
-    $app['dispatcher']-&gt;dispatch('article.created', $event);
-
-    return new Response([], 201);
-});
-
-// Send all 'article.created' events to push server
-$app-&gt;forwardEventToPushServer('article.created');
-</code></pre>
-</div>
-
-<p>In websocket server stack:</p>
-
-<div class="language-php highlighter-rouge"><pre class="highlight"><code>use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-class MyWebsocketTopic extends Eole\Sandstone\Websocket\Topic implements EventSubscriberInterface
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>class ChatTopic extends Eole\Sandstone\Websocket\Topic
 {
-    public static function getSubscribedEvents()
-    {
-        return [
-            'article.created' =&gt; 'onArticleCreated',
-        ];
-    }
-
-    public function onArticleCreated(ArticleEvent $event)
-    {
-        // Broadcast message on this topic when an article has been created.
-        $this-&gt;broadcast([
-            'message' =&gt; 'An article has just been published: '.$event-&gt;title,
-        ]);
-    }
+    // Where you can implement chat topic logic
+    public function onPublish(Ratchet\Wamp\WampConnection $conn, $topic, $event) {}
+    public function onSubscribe(Ratchet\Wamp\WampConnection $conn, $topic) {}
+    public function onUnSubscribe(Ratchet\Wamp\WampConnection $conn, $topic) {}
 }
 </code></pre>
 </div>
 
 <blockquote>
-  <p>See more in the
-<a href="/sandstone/examples/full.html">Full example</a>.</p>
+  <p>See <a href="/sandstone/examples/multichannel-chat.html">Example of Chat server</a>
+to have a full exemple of this <code class="highlighter-rouge">ChatTopic</code>.</p>
 </blockquote>
 
-<h2 id="sandstone-edition">Sandstone edition</h2>
+<h2 id="adding-arguments-in-topic-route">Adding arguments in topic route</h2>
 
-<p>If you want to start a new project or a real-time RestApi,
-you may consider using <a href="https://github.com/eole-io/sandstone-edition">Sandstone edition</a>.</p>
+<p>You may need to declare multiple chat topics,
+i.e <code class="highlighter-rouge">chat/series</code>, <code class="highlighter-rouge">chat/manga</code>, <code class="highlighter-rouge">chat/gaming</code>, <code class="highlighter-rouge">chat/actu</code>, …</p>
 
-<p>This edition is a starter project with:</p>
+<p>So you have to make the topic name dynamic, with <code class="highlighter-rouge">chat/{channel}</code>:</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>$app-&gt;topic('chat/{channel}', function ($topicPattern) {
+    return new ChatTopic($topicPattern);
+});
+</code></pre>
+</div>
+
+<p>With this example, you can use the same <code class="highlighter-rouge">ChatTopic</code> class.</p>
+
+<p>Sandstone will implement multiple topic instances of this same class
+everytime someone subscribes or publish to a new <code class="highlighter-rouge">chat/{channel}</code>
+which has not yet been used.</p>
+
+<p>Then, when someone subscribes and/or publish on a new chat topic,
+i.e <code class="highlighter-rouge">chat/my-new-topic</code>, Sandstone will instanciate a new websocket topic
+from the <code class="highlighter-rouge">ChatTopic</code> (because <code class="highlighter-rouge">chat/my-new-topic</code> matches <code class="highlighter-rouge">chat/{channel}</code>)
+with <code class="highlighter-rouge">my-new-topic</code> as route argument.</p>
+
+<h2 id="retrieve-topic-route-arguments">Retrieve topic route arguments</h2>
+
+<p>Let admit someone subscribes to <code class="highlighter-rouge">chat/my-new-topic</code> topic channel.
+Sandstone will create a new instance of <code class="highlighter-rouge">ChatTopic</code>.</p>
+
+<p>You may need to access to topic arguments, here <code class="highlighter-rouge">"my-new-topic"</code>,
+in you <code class="highlighter-rouge">ChatTopic</code>.</p>
+
+<p>Here is how to to do it: Sandstone passes route arguments in your topic callback
+as an array, in a second argument.</p>
+
+<p>So just retrieve the channel name in this array and pass it to your <code class="highlighter-rouge">ChatTopic</code> constructor:</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>$app-&gt;topic('chat/{channel}', function ($topicPattern, $arguments) {
+
+    $channel = $arguments['channel'];
+
+    return new ChatTopic($topicPattern, $channel);
+});
+</code></pre>
+</div>
+
+<p>Then, in your <code class="highlighter-rouge">ChatTopic</code> constructor:</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>class ChatTopic extends Eole\Sandstone\Websocket\Topic
+{
+    /**
+     * @var string
+     */
+    private $channel;
+
+    /**
+     * @param string $topicPath
+     * @param string $channel
+     */
+    public function __construct($topicPath, $channel)
+    {
+        parent::__construct($topicPath);
+
+        $this-&gt;channel = $channel;
+    }
+}
+</code></pre>
+</div>
+
+<p>You now have access to the <code class="highlighter-rouge">$channel</code> argument used in topic route <code class="highlighter-rouge">chat/{channel}</code>.
+You can by example greeting new subscribers:</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>    public function onSubscribe(Ratchet\Wamp\WampConnection $conn, $topic)
+    {
+        parent::onSubscribe($conn, $topic);
+
+        // Greeting new subscriber.
+        $conn-&gt;event([
+            'type' =&gt; 'greet',
+            'message' =&gt; 'Hello, welcome on '.$this-&gt;channel',
+        ]);
+
+        // Broadcast everyone that someone joined the channel
+        $this-&gt;broadcast([
+            'type' =&gt; 'join',
+            'message' =&gt; 'Someone has joined this channel.',
+        ]);
+    }
+</code></pre>
+</div>
+
+<h2 id="add-constraints-on-route-parameters">Add constraints on route parameters</h2>
+
+<p>Declaring a topic route is the same as declaring an http route.</p>
+
+<blockquote>
+  <p><strong>Note</strong>: See Silex documentation about route configuration:
+<a href="https://silex.symfony.com/index.php/doc/2.0/usage.html#global-configuration">Routing Global Configuration</a></p>
+</blockquote>
+
+<p>So you can add constraints, by example:</p>
 
 <ul>
-  <li><a href="https://eole-io.github.io/sandstone/">Sandstone</a> (Silex with websockets)</li>
-  <li><strong>Docker</strong> environment to mount the whole application (RestApi, websocket server, MariaDB, PHPMyAdmin)</li>
-  <li><strong>Doctrine ORM</strong> and Doctrine commands</li>
-  <li><strong>Symfony web profiler</strong> for debugging RestApi requests and Push events</li>
-  <li><a href="https://github.com/danadesrosiers/silex-annotation-provider">Silex annotations</a> for controllers and routing annotations</li>
+  <li>Allow only number for id</li>
 </ul>
 
-<p>It’s for people who will need a real-time RestApi with a database and an ORM, debug tools,
-and don’t want to install all these tools and initiate the project structure (controllers, entities…).</p>
-
-<p>It also has a Docker environment, so that you can install and run the app easily.</p>
-
-<p>Check it out: <i class="fa fa-github fa-lg" aria-hidden="true"></i> <a href="https://github.com/eole-io/sandstone-edition">Sandstone edition</a></p>
-
-<h2 id="full-working-examples">Full working examples</h2>
-
-<p>See what you can do with examples:</p>
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>$app
+    -&gt;topic('games/{id}/moves-played', function ($topicPattern, $arguments) {
+        return new GameTopic($topicPattern, $arguments['id']);
+    })
+    -&gt;assert('id', '\d+')
+;
+</code></pre>
+</div>
 
 <ul>
-  <li><i class="fa fa-code" aria-hidden="true"></i> <a href="/sandstone/examples/full.html">Full example of a rest api working with a websocket server</a></li>
-  <li><i class="fa fa-code" aria-hidden="true"></i> <a href="/sandstone/examples/multichannel-chat.html">Multichannel chat server</a></li>
+  <li>Make argument optional and add a default value</li>
 </ul>
 
-<h3 id="docker">Docker</h3>
-
-<p>A full example of a Sandstone application also exists as a Docker image.</p>
-
-<p>Check it on Bitbucket: <a href="https://bitbucket.org/zareba_pawel/php-websockets-sandstone">zareba_pawel/php-websockets-sandstone</a></p>
-
-<h2 id="license">License</h2>
-
-<p>Sandstone is under <a href="https://github.com/eole-io/sandstone/blob/master/LICENSE">MIT license</a>.</p>
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>$app
+    -&gt;topic('chat/{channel}', function ($topicPattern, $arguments) {
+        return new GhatTopic($topicPattern, $arguments['channel']);
+    })
+    -&gt;value('channel', 'general')
+;
+</code></pre>
+</div>
 
         </div>
     </div>
