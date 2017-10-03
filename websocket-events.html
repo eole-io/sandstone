@@ -278,7 +278,8 @@ clients will connect and disconnect, and subscribe to a wamp topic to publish me
 </div>
 
 <ul>
-  <li>Then, register this listener as a Silex <code class="highlighter-rouge">EventListenerProviderInterface</code></li>
+  <li>Then, add in a Silex provider that implements <code class="highlighter-rouge">EventListenerProviderInterface</code>,
+in the method <code class="highlighter-rouge">subscribe</code>:</li>
 </ul>
 
 <div class="language-php highlighter-rouge"><pre class="highlight"><code><span class="cp">&lt;?php</span>
@@ -296,6 +297,27 @@ clients will connect and disconnect, and subscribe to a wamp topic to publish me
 <span class="p">}</span>
 </code></pre>
 </div>
+
+<blockquote>
+  <p>See more about <code class="highlighter-rouge">EventListenerProviderInterface</code> in
+<a href="https://silex.symfony.com/index.php/doc/2.0/providers.html#creating-a-provider">Silex documentation about “Creating a provider”</a>.</p>
+</blockquote>
+
+<ul>
+  <li>Finally, register this provider in your Sandstone application:</li>
+</ul>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>$app-&gt;register(new MyProvider());
+</code></pre>
+</div>
+
+<blockquote>
+  <p><strong>Note</strong>: <code class="highlighter-rouge">$app</code> is your Sandstone application instance,
+created with <code class="highlighter-rouge">$app = new Eole\Sandstone\Application()</code>.</p>
+
+  <p>See <a href="/sandstone/examples/full.html">Full example of Sandstone application</a>
+to have an example to how to bootstrap a Sandstone application.</p>
+</blockquote>
 
 <h2 id="another-example-listen-to-published-messages">Another example: listen to published messages</h2>
 
@@ -350,6 +372,14 @@ clients will connect and disconnect, and subscribe to a wamp topic to publish me
         <span class="nv">$dispatcher</span><span class="o">-&gt;</span><span class="na">addSubscriber</span><span class="p">(</span><span class="k">new</span> <span class="nx">MyMessagePublishListener</span><span class="p">());</span>
     <span class="p">}</span>
 <span class="p">}</span>
+</code></pre>
+</div>
+
+<ul>
+  <li>Finally, register this provider in your Sandstone application:</li>
+</ul>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>$app-&gt;register(new MyProvider());
 </code></pre>
 </div>
 

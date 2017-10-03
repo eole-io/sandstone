@@ -150,7 +150,7 @@
 
 <h2 id="wamp-protocol-v1">WAMP protocol v1</h2>
 
-<p>As you can see, Sandstone uses the first version of WAMP protocol.</p>
+<p>Sandstone uses the first version of WAMP protocol.</p>
 
 <p>This choice has be done over the v2 because at this time, <strong>server-side</strong>,
 this version is better documented than the v2.</p>
@@ -171,9 +171,10 @@ while the rest api send tcp messages to the socket.</p>
 <p>First, I used ZMQ to abstract socket creation and listen with PHP.</p>
 
 <p>But I don’t want to use ZMQ directly in rest api controller to send messages,
-and make controllers dependant to ZMQ.
-<br />
-I used Symfony EventDispatcher to abstract sending messages.</p>
+and make controllers dependant to ZMQ.</p>
+
+<p>I wanted to send events from controllers to websocket topics by
+only dispatching Symfony events, which is <strong>one of the main Sandstone feature</strong>.</p>
 
 <p>So messages becomes events:</p>
 
@@ -231,7 +232,8 @@ just declare the ones you want to forward with <code class="highlighter-rouge">$
 
 <h2 id="websocket-topics">Websocket topics</h2>
 
-<p>I wanted to declare topics as simple as Silex does with routes.</p>
+<p>I wanted to declare topics as simple as Silex does with routes,
+which is <strong>one of the main Sandstone feature</strong>.</p>
 
 <p>How Silex declares a route:</p>
 

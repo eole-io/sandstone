@@ -182,7 +182,8 @@ i.e <code class="highlighter-rouge">chat/series</code>, <code class="highlighter
 </code></pre>
 </div>
 
-<p>With this example, you can use the same <code class="highlighter-rouge">ChatTopic</code> class.</p>
+<p>With this example, you can use the same <code class="highlighter-rouge">ChatTopic</code> class
+for every topic subscribed by JavaScript clients.</p>
 
 <p>Sandstone will implement multiple topic instances of this same class
 everytime someone subscribes or publish to a new <code class="highlighter-rouge">chat/{channel}</code>
@@ -195,7 +196,7 @@ with <code class="highlighter-rouge">my-new-topic</code> as route argument.</p>
 
 <h2 id="retrieve-topic-route-arguments">Retrieve topic route arguments</h2>
 
-<p>Let admit someone subscribes to <code class="highlighter-rouge">chat/my-new-topic</code> topic channel.
+<p>Let’s admit someone subscribes for the first time to <code class="highlighter-rouge">chat/my-new-topic</code> topic.
 Sandstone will create a new instance of <code class="highlighter-rouge">ChatTopic</code>.</p>
 
 <p>You may need to access to topic arguments, here <code class="highlighter-rouge">"my-new-topic"</code>,
@@ -272,7 +273,7 @@ You can by example greeting new subscribers:</p>
 <p>So you can add constraints, by example:</p>
 
 <ul>
-  <li>Allow only number for id</li>
+  <li>Regex: allow only number for id</li>
 </ul>
 
 <div class="language-php highlighter-rouge"><pre class="highlight"><code>$app
@@ -285,13 +286,40 @@ You can by example greeting new subscribers:</p>
 </div>
 
 <ul>
+  <li>Regex: limit only some argument values</li>
+</ul>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>$app
+    -&gt;topic('chat/{channel}', function ($topicPattern, $arguments) {
+        return new ChatTopic($topicPattern, $arguments['channel']);
+    })
+    -&gt;assert('channel', '^(general|series|manga|gaming|actu)$')
+;
+</code></pre>
+</div>
+
+<ul>
   <li>Make argument optional and add a default value</li>
 </ul>
 
 <div class="language-php highlighter-rouge"><pre class="highlight"><code>$app
     -&gt;topic('chat/{channel}', function ($topicPattern, $arguments) {
-        return new GhatTopic($topicPattern, $arguments['channel']);
+        return new ChatTopic($topicPattern, $arguments['channel']);
     })
+    -&gt;value('channel', 'general')
+;
+</code></pre>
+</div>
+
+<ul>
+  <li>Using multiple rules at same time</li>
+</ul>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>$app
+    -&gt;topic('chat/{channel}', function ($topicPattern, $arguments) {
+        return new ChatTopic($topicPattern, $arguments['channel']);
+    })
+    -&gt;assert('channel', '^(general|series|manga|gaming|actu)$')
     -&gt;value('channel', 'general')
 ;
 </code></pre>
