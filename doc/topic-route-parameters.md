@@ -48,7 +48,8 @@ $app->topic('chat/{channel}', function ($topicPattern) {
 });
 ```
 
-With this example, you can use the same `ChatTopic` class.
+With this example, you can use the same `ChatTopic` class
+for every topic subscribed by JavaScript clients.
 
 Sandstone will implement multiple topic instances of this same class
 everytime someone subscribes or publish to a new `chat/{channel}`
@@ -62,7 +63,7 @@ with `my-new-topic` as route argument.
 
 ## Retrieve topic route arguments
 
-Let admit someone subscribes to `chat/my-new-topic` topic channel.
+Let's admit someone subscribes for the first time to `chat/my-new-topic` topic.
 Sandstone will create a new instance of `ChatTopic`.
 
 You may need to access to topic arguments, here `"my-new-topic"`,
@@ -137,7 +138,7 @@ Declaring a topic route is the same as declaring an http route.
 
 So you can add constraints, by example:
 
-- Allow only number for id
+- Regex: allow only number for id
 
 ``` php
 $app
@@ -148,13 +149,36 @@ $app
 ;
 ```
 
+- Regex: limit only some argument values
+
+``` php
+$app
+    ->topic('chat/{channel}', function ($topicPattern, $arguments) {
+        return new ChatTopic($topicPattern, $arguments['channel']);
+    })
+    ->assert('channel', '^(general|series|manga|gaming|actu)$')
+;
+```
+
 - Make argument optional and add a default value
 
 ``` php
 $app
     ->topic('chat/{channel}', function ($topicPattern, $arguments) {
-        return new GhatTopic($topicPattern, $arguments['channel']);
+        return new ChatTopic($topicPattern, $arguments['channel']);
     })
+    ->value('channel', 'general')
+;
+```
+
+- Using multiple rules at same time
+
+``` php
+$app
+    ->topic('chat/{channel}', function ($topicPattern, $arguments) {
+        return new ChatTopic($topicPattern, $arguments['channel']);
+    })
+    ->assert('channel', '^(general|series|manga|gaming|actu)$')
     ->value('channel', 'general')
 ;
 ```
