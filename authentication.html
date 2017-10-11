@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Authentication</title>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://bootswatch.com/sandstone/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/sandstone/css/prism.css">
+        <link rel="stylesheet" href="/sandstone/css/all.css">
+    </head>
+    <body>
+        <nav class="navbar navbar-default navbar-fixed-top nav-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/sandstone/">Sandstone</a>
+
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a
+                    href="https://github.com/eole-io/sandstone"
+                    class="github-button"
+                    aria-label="Star eole-io/sandstone on GitHub"
+                    data-count-aria-label="# stargazers on GitHub"
+                    data-count-api="/repos/eole-io/sandstone#stargazers_count"
+                    data-count-href="/eole-io/sandstone/stargazers"
+                    data-style="mega"
+                >Star Sandstone</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
+        <div class="jumbotron">
+    <div class="container">
+        <h1>Sandstone</h1>
+        <p>Silex RestApi with Websockets.</p>
+        <a href="/sandstone/examples/full.html" class="btn btn-lg btn-primary">Get started</a>
+    </div>
+</div>
+
+<div class="container space-top">
+    <div class="row">
+        <div class="col-sm-3">
+            <nav class="nav nav-left">
+    <ul class="nav nav-pills nav-stacked">
+        <li 
+>
+            <a href="/sandstone/">
+                <i class="fa fa-home" aria-hidden="true"></i>
+                Home
+                <br>
+                <span>Introduction + Basic usage</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/examples/full.html">
+                <i class="fa fa-code" aria-hidden="true"></i>
+                Example: Full app
+                <br>
+                <span>RestApi + Websocket + Push</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/examples/multichannel-chat.html">
+                <i class="fa fa-code" aria-hidden="true"></i>
+                Example: Chat server
+                <br>
+                <span>Websocket</span>
+            </a>
+        </li>
+        <li class="active"
+>
+            <a href="/sandstone/authentication.html">
+                <i class="fa fa-user" aria-hidden="true"></i>
+                Authentication
+                <br>
+                <span>Rest API + websocket connections</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/topic-route-parameters.html">
+                <i class="fa fa-sitemap" aria-hidden="true"></i>
+                Topic route parameters
+                <br>
+                <span>Retrieve topic route arguments</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/websocket-events.html">
+                <i class="fa fa-wifi" aria-hidden="true"></i>
+                Listen websocket events
+                <br>
+                <span>onOpen, onClose, onPublish...</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/push-debug-profiler.html">
+                <i class="fa fa-list-alt" aria-hidden="true"></i>
+                Push debug profiler
+                <br>
+                <span>Enable that awesome debug tool !</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/big-picture.html">
+                <i class="fa fa-picture-o" aria-hidden="true"></i>
+                Big picture
+                <br>
+                <span>Sandstone full schema</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/under-the-hood.html">
+                <i class="fa fa-cogs" aria-hidden="true"></i>
+                Under the hood
+                <br>
+                <span>Used libraries</span>
+            </a>
+        </li>
+        <li 
+>
+            <a href="/sandstone/install-zmq-php-linux.html">
+                <i class="fa fa-archive" aria-hidden="true"></i>
+                ZMQ Linux installation
+                <br>
+                <span>and php binding</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+        </div>
+        <div class="col-sm-9">
+            <h1 class="no-margin-top">Authentication</h1>
+
+<p>If your application has users, you maybe need to provide them a way to authenticate
+their Rest API requests, and also their websocket connections.</p>
+
+<p>As Sandstone uses Symfony, you can securize RestAPI requests as described in the
+documentation. See <a href="https://silex.symfony.com/doc/2.0/providers/security.html">Silex security</a>.</p>
+
+<p>For an authenticated websocket connection,
+Sandstone provide an OAuth2 provider based on the library
+<a href="https://github.com/thephpleague/oauth2-server">thephpleague/oauth2-server</a>.</p>
+
+<h2 id="sandstone-authentication">Sandstone authentication</h2>
+
+<p>The Sandstone OAuth2 provider allows to use same authentication tokens for a
+Rest API request and a websocket connection.</p>
+
+<p>The idea is that you first get an OAuth access token from the Rest API
+using your username and password.
+You then receive an access token you can use to:</p>
+
+<ul>
+  <li>authenticate your Rest API requests by adding it in headers:</li>
+</ul>
+
+<div class="language-http highlighter-rouge"><pre class="highlight"><code><span class="err">GET /api/hello
+
+Authorization: Bearer L83pR5amKt
+</span></code></pre>
+</div>
+
+<ul>
+  <li>authenticate your websocket connection at the opening:</li>
+</ul>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">websocket</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="s1">'ws://localhost:8482?access_token=L83pR5amKt'</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h2 id="implementation">Implementation</h2>
+
+<h3 id="symfony-authentication">Symfony authentication</h3>
+
+<p>If you already configured your Symfony security firewall, you can skip this step
+and use your own configuration.</p>
+
+<p>Otherwise, let’s implement a basic authentication system. Here using Symfony’s
+<code class="highlighter-rouge">InMemoryUserProvider</code>, I’ll create a hardcoded user in configuration.
+Up to you to implement your own Symfony <code class="highlighter-rouge">UserProvider</code>, see
+<a href="https://symfony.com/doc/current/security/custom_provider.html">How to Create a custom User Provider</a>.</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>use Symfony\Component\Security\Core\User\InMemoryUserProvider;
+use Silex\Provider\SecurityServiceProvider;
+use Eole\Sandstone\Application as SandstoneApplication;
+
+$app = new SandstoneApplication([
+    'project.root' =&gt; dirname(__DIR__),
+    'env' =&gt; 'dev',
+    'debug' =&gt; true,
+]);
+
+$app['app.user_provider'] = function () {
+    return new InMemoryUserProvider([
+        // username: admin / password: foo
+        'admin' =&gt; [
+            'roles' =&gt; ['ROLE_ADMIN'],
+            'password' =&gt; '$2y$10$3i9/lVd8UOFIJ6PAMFt8gu3/r5g0qeCJvoSlLCsvMTythye19F77a',
+        ],
+    ]);
+};
+
+$app-&gt;register(new SecurityServiceProvider(), [
+    'security.firewalls' =&gt; [
+        'api' =&gt; [
+            'pattern' =&gt; '^/api',
+            'anonymous' =&gt; true,
+            'http' =&gt; true,
+            'users' =&gt; $app['app.user_provider'],
+        ],
+    ],
+]);
+
+$app-&gt;run();
+</code></pre>
+</div>
+
+<p>I configured the <code class="highlighter-rouge">api</code> firewall which securize all routes starting with <code class="highlighter-rouge">/api</code>.
+In my Sandstone application, it represents the whole Rest API.
+This firewall allows anonymous requests (<code class="highlighter-rouge">'anonymous' =&gt; true</code>),
+so authentication is optional unless I add a condition in my controllers.</p>
+
+<blockquote>
+  <p>I also added <code class="highlighter-rouge">'http' =&gt; true</code> to allows basic authentication for the following example.</p>
+</blockquote>
+
+<blockquote>
+  <p><strong>Note</strong>: This example is based on Silex security documentation.
+See <a href="https://silex.symfony.com/doc/2.0/providers/security.html">Silex security</a>.</p>
+</blockquote>
+
+<p>Now I can already authenticate my Rest API requests. Let’s test it by
+adding the <code class="highlighter-rouge">GET /api/hello</code> route:</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>use Symfony\Component\HttpFoundation\JsonResponse;
+
+$app-&gt;get('api/hello', function () use ($app) {
+    $result = [
+        'authenticated' =&gt; $app['user'] ? $app['user']-&gt;getUsername() : '*nope*',
+    ];
+
+    return new JsonResponse($result);
+});
+</code></pre>
+</div>
+
+<p>If I requests it without authentication, I get:</p>
+
+<div class="language-http highlighter-rouge"><pre class="highlight"><code><span class="err"># Request
+GET /api/hello
+
+# Response
+{
+    "authenticated": "*nope*"
+}
+</span></code></pre>
+</div>
+
+<p>By authenticating <code class="highlighter-rouge">admin:foo</code> with basic auth, I get:</p>
+
+<div class="language-http highlighter-rouge"><pre class="highlight"><code><span class="err"># Request
+GET /api/hello
+
+Authorization: Basic YWRtaW46Zm9v
+
+# Response
+{
+    "authenticated": "admin"
+}
+</span></code></pre>
+</div>
+
+<blockquote>
+  <p>The string <code class="highlighter-rouge">YWRtaW46Zm9v</code> is the base64 encoded of <code class="highlighter-rouge">admin:foo</code>.
+See <a href="https://en.wikipedia.org/wiki/Basic_access_authentication">Basic access authentication</a>.</p>
+</blockquote>
+
+<h3 id="register-sandstone-oauth2">Register Sandstone OAuth2</h3>
+
+<p>In order to authenticate websocket connections, you have to register Sandstone’s
+OAuth2 provider with some configuration:</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>use Eole\Sandstone\OAuth2\Silex\OAuth2ServiceProvider;
+
+$app-&gt;register(new OAuth2ServiceProvider(), [
+    'oauth.firewall_name' =&gt; 'api',
+    'oauth.security.user_provider' =&gt; 'app.user_provider',
+    'oauth.tokens_dir' =&gt; $app['project.root'].'/var/oauth-tokens',
+    'oauth.scope' =&gt; [
+        'id' =&gt; 'sandstone-scope',
+        'description' =&gt; 'Sandstone scope.',
+    ],
+    'oauth.clients' =&gt; [
+        'my-web-application' =&gt; [
+            'name' =&gt; 'my-app-name',
+            'id' =&gt; 'my-app',
+            'secret' =&gt; 'my-app-secret',
+        ],
+    ],
+]);
+</code></pre>
+</div>
+
+<p>Configuration details:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">oauth.firewall_name</code> is the firewall to use to securize websocket connections</li>
+  <li><code class="highlighter-rouge">oauth.security.user_provider</code> set your user provider service name</li>
+  <li><code class="highlighter-rouge">oauth.tokens_dir</code> folder to store oauth tokens</li>
+  <li><code class="highlighter-rouge">oauth.scope</code> the scope of your oauth token</li>
+  <li><code class="highlighter-rouge">oauth.clients</code> your api keys for clients who use oauth</li>
+</ul>
+
+<p><strong>You also need to update your firewall configuration</strong> to make authentication
+stateless and use oauth:</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>    'security.firewalls' =&gt; [
+        'api' =&gt; [
+            // ...
+            'oauth' =&gt; true,
+            'stateless' =&gt; true,
+        ],
+    ],
+</code></pre>
+</div>
+
+<blockquote>
+  <p><strong>Note</strong>:
+See <a href="https://silex.symfony.com/doc/2.0/providers/security.html#stateless-authentication">Stateless Authentication</a>
+on Silex documentation.</p>
+</blockquote>
+
+<p>You can now test your OAuth, but you first need a way to issue an access token
+from the Rest API.</p>
+
+<h3 id="create-a-controller-to-get-an-access-token">Create a controller to get an access token</h3>
+
+<p>Sandstone OAuth component provides a service to issue a token. You have to call
+<code class="highlighter-rouge">$app['sandstone.oauth.controller']-&gt;postAccessToken($request)</code> from a controller,
+and return the token to the client.</p>
+
+<p>Here is an example of a controller:</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>use League\OAuth2\Server\Exception\OAuthException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+$app-&gt;post('/oauth/access-token', function (Request $request) use ($app) {
+    try {
+        $token = $app['sandstone.oauth.controller']-&gt;postAccessToken($request);
+
+        return new JsonResponse($token);
+    } catch (OAuthException $e) {
+        return new JsonResponse([
+            'oauth_error_type' =&gt; $e-&gt;errorType,
+            'message' =&gt; $e-&gt;getMessage(),
+            'parameter' =&gt; $e-&gt;getParameter(),
+            'should_redirect' =&gt; $e-&gt;shouldRedirect(),
+            'redirect' =&gt; $e-&gt;redirectUri,
+        ], $e-&gt;httpStatusCode);
+    }
+});
+</code></pre>
+</div>
+
+<blockquote>
+  <p><strong>Note</strong>: Make the access token route <strong>outside</strong> the <code class="highlighter-rouge">api</code> firewall so that
+getting an access token is not behind OAuth security.
+In this example, the access token route prefix is <code class="highlighter-rouge">/oauth/</code>
+whereas the api routes prefixes are <code class="highlighter-rouge">/api/</code>.</p>
+</blockquote>
+
+<h3 id="get-an-oauth-access-token">Get an OAuth access token</h3>
+
+<p>An access token is a string like <code class="highlighter-rouge">VBLQa98foR2dOSJpb9bugh00e1r7H74manwEhmbj</code>.
+It’s generated from the server, and associated to an user.
+It has an expiration time, so you have to get another one before it expires.</p>
+
+<p>Sandstone also uses refresh tokens. You then get also a refresh token
+you may store when you get an access token.</p>
+
+<blockquote>
+  <p>See <a href="https://oauth2.thephpleague.com/authorization-server/which-grant/">Which OAuth 2.0 grant should I implement?</a>
+from thephpleague oauth2 server documentation.</p>
+</blockquote>
+
+<p>You can get an access token from your Rest API by using a grant type.</p>
+
+<h4 id="password-grant-type">Password grant type</h4>
+
+<p>Get an access token with your username and password. It’s usefull for the first
+connection.</p>
+
+<div class="language-http highlighter-rouge"><pre class="highlight"><code><span class="err">POST /oauth/access-token
+
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&amp;client_id=my-app&amp;client_secret=my-app-secret&amp;username=admin&amp;password=foo
+</span></code></pre>
+</div>
+
+<p>Response example:</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="p">{</span>
+    <span class="s2">"access_token"</span><span class="err">:</span> <span class="s2">"VBLQa98foR2dOSJpb9bugh00e1r7H74manwEhmbj"</span><span class="p">,</span>
+    <span class="s2">"token_type"</span><span class="err">:</span> <span class="s2">"Bearer"</span><span class="p">,</span>
+    <span class="s2">"expires_in"</span><span class="err">:</span> <span class="mi">3600</span><span class="p">,</span>
+    <span class="s2">"refresh_token"</span><span class="err">:</span> <span class="s2">"JyrPAZZU17EDYIFSxnKmsX3HzwxGSW1fijEu5rsL"</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<h4 id="refresh-token-grant-type">Refresh Token grant type</h4>
+
+<p>Get an access token from your last refresh token. It’s usefull to not resend
+your secret credentials. Also you won’t need to store user password in your
+client application, but only the refresh token.</p>
+
+<div class="language-http highlighter-rouge"><pre class="highlight"><code><span class="err">POST /oauth/access-token
+
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token&amp;client_id=my-app&amp;client_secret=my-app-secret&amp;refresh_token=JyrPAZZU17EDYIFSxnKmsX3HzwxGSW1fijEu5rsL
+</span></code></pre>
+</div>
+
+<p>You’ll get a similar response as the example above, with a new access token and
+refresh token.</p>
+
+<h3 id="use-the-access-token">Use the access token</h3>
+
+<h4 id="in-rest-api-requests">In Rest API requests</h4>
+
+<div class="language-http highlighter-rouge"><pre class="highlight"><code><span class="err">GET /api/hello
+
+Authorization: Bearer VBLQa98foR2dOSJpb9bugh00e1r7H74manwEhmbj
+</span></code></pre>
+</div>
+
+<h4 id="in-websocket-connection">In websocket connection</h4>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">websocket</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="s1">'ws://localhost:8482?access_token=VBLQa98foR2dOSJpb9bugh00e1r7H74manwEhmbj'</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>You’ll then see in your websocket server logs:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[info] Authentication... []
+[info] User logged. {"username":"alcalyn"}
+</code></pre>
+</div>
+
+<h2 id="enable-the-security-panel-in-the-profiler">Enable the security panel in the profiler</h2>
+
+<p>You can enable the Security panel in your Symfony profiler
+by adding <code class="highlighter-rouge">symfony/security-bundle</code> in your dependencies.</p>
+
+<p>Just do:</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>composer require symfony/security-bundle
+</code></pre>
+</div>
+
+<p>Make an Api call, then you should see the new panel by profiling the new request.</p>
+
+<blockquote>
+  <p>See on Github <a href="https://github.com/silexphp/Silex-WebProfiler">silexphp/Silex-WebProfiler</a></p>
+</blockquote>
+
+<h2 id="full-authenticated-application-example">Full authenticated application example</h2>
+
+<p>Here is the full working example with an OAuth authentication.</p>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code>require_once '../vendor/autoload.php';
+
+use League\OAuth2\Server\Exception\OAuthException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
+use Silex\Provider\SecurityServiceProvider;
+use Eole\Sandstone\OAuth2\Silex\OAuth2ServiceProvider;
+use Eole\Sandstone\Application as SandstoneApplication;
+
+$app = new SandstoneApplication([
+    'project.root' =&gt; dirname(__DIR__),
+    'env' =&gt; 'dev',
+    'debug' =&gt; true,
+]);
+
+$app['app.user_provider'] = function () {
+    return new InMemoryUserProvider([
+        // username: admin / password: foo
+        'admin' =&gt; [
+            'roles' =&gt; ['ROLE_ADMIN'],
+            'password' =&gt; '$2y$10$3i9/lVd8UOFIJ6PAMFt8gu3/r5g0qeCJvoSlLCsvMTythye19F77a',
+        ],
+    ]);
+};
+
+$app-&gt;register(new SecurityServiceProvider(), [
+    'security.firewalls' =&gt; [
+        'api' =&gt; [
+            'pattern' =&gt; '^/api',
+            'oauth' =&gt; true,
+            'stateless' =&gt; true,
+            'anonymous' =&gt; true,
+            'users' =&gt; $app['app.user_provider'],
+        ],
+    ],
+]);
+
+$app-&gt;register(new OAuth2ServiceProvider(), [
+    'oauth.firewall_name' =&gt; 'api',
+    'oauth.security.user_provider' =&gt; 'app.user_provider',
+    'oauth.tokens_dir' =&gt; $app['project.root'].'/var/oauth-tokens',
+    'oauth.scope' =&gt; [
+        'id' =&gt; 'sandstone-scope',
+        'description' =&gt; 'Sandstone scope.',
+    ],
+    'oauth.clients' =&gt; [
+        'my-web-application' =&gt; [
+            'name' =&gt; 'my-app-name',
+            'id' =&gt; 'my-app',
+            'secret' =&gt; 'my-app-secret',
+        ],
+    ],
+]);
+
+$app-&gt;post('/oauth/access-token', function (Request $request) use ($app) {
+    try {
+        $token = $app['sandstone.oauth.controller']-&gt;postAccessToken($request);
+
+        return new JsonResponse($token);
+    } catch (OAuthException $e) {
+        return new JsonResponse([
+            'oauth_error_type' =&gt; $e-&gt;errorType,
+            'message' =&gt; $e-&gt;getMessage(),
+            'parameter' =&gt; $e-&gt;getParameter(),
+            'should_redirect' =&gt; $e-&gt;shouldRedirect(),
+            'redirect' =&gt; $e-&gt;redirectUri,
+        ], $e-&gt;httpStatusCode);
+    }
+});
+
+$app-&gt;get('api/hello', function () use ($app) {
+    $result = [
+        'authenticated' =&gt; $app['user'] ? $app['user']-&gt;getUsername() : '*nope*',
+    ];
+
+    return new JsonResponse($result);
+});
+
+$app-&gt;run();
+</code></pre>
+</div>
+
+<p>Here is the Postman collection:</p>
+
+<p><a href="assets/sandstone_oauth.postman_collection.json"><i class="fa fa-download fa-lg" aria-hidden="true"></i>
+sandstone_oauth.postman_collection.json</a></p>
+
+<blockquote>
+  <p><a href="https://www.getpostman.com/">Postman</a> allows to run presaved requests to an
+API. Import this file and you’ll get requests examples to your Sandstone
+application with OAuth.</p>
+</blockquote>
+
+<p>Here is an example of websocket connection with an access token using Javascript:</p>
+
+<div class="language-js highlighter-rouge"><pre class="highlight"><code><span class="nx">ab</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="s1">'ws://0.0.0.0:8482?access_token=L83pR5amKtRdaTo3hTBsaD7tp8tcWWCCsKgGMH9M'</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<blockquote>
+  <p>I use here AutobahnJS 0.8</p>
+</blockquote>
+
+        </div>
+    </div>
+</div>
+
+
+        <footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4 text-center">
+                <p>Sandstone is under <a href="https://github.com/eole-io/sandstone/blob/master/LICENSE">MIT license</a>.</p>
+                <br />
+
+                <ul class="list-unstyled">
+                    <li>
+                        <i class="fa fa-github fa-lg" aria-hidden="true"></i>
+                        <a href="https://github.com/eole-io/sandstone">Sandstone</a>
+                    </li>
+                    <li>
+                        <i class="fa fa-github fa-lg" aria-hidden="true"></i>
+                        <a href="https://github.com/eole-io/sandstone-edition">Sandstone edition</a>
+                    </li>
+                </ul>
+                <br />
+
+                <p>
+                    Follow updates and news:
+                    <br />
+                    <a
+                        href="https://twitter.com/sandstone_php"
+                        class="twitter-follow-button"
+                        data-size="large"
+                        data-show-count="false"
+                    >Follow @sandstone_php</a>
+                    <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+                </p>
+                <br />
+
+                <p>
+                    Find me here:
+                    <br />
+                    <a href="https://github.com/alcalyn">
+                        <i class="fa fa-github fa-lg" aria-hidden="true"></i>
+                        alcalyn
+                    </a>
+                    -
+                    <a href="https://twitter.com/alcalyn_">
+                        <i class="fa fa-twitter fa-lg" aria-hidden="true"></i>
+                        alcalyn_
+                    </a>
+                </p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class='jekyll-twitter-plugin'><a class="twitter-timeline" data-width="400" data-tweet-limit="2" href="https://twitter.com/sandstone_php?ref_src=twsrc%5Etfw">Tweets by sandstone_php</a>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+        <script async defer src="https://buttons.github.io/buttons.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="/sandstone/js/prism.js"></script>
+    </body>
+</html>
