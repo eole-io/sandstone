@@ -1,0 +1,158 @@
+{
+  "variables": [],
+  "info": {
+    "name": "Sandstone OAuth",
+    "_postman_id": "7cd96149-2e38-8ae6-ed52-6a5bab63d801",
+    "description": "",
+    "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "GET /hello",
+      "request": {
+        "url": "http://0.0.0.0:8480/index-dev.php/api/hello",
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer s2Nw79ZFe5sDAPsDVKxH9dRsYwgMDvX1KNCsVRzF",
+            "description": ""
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "grant_type",
+              "value": "password",
+              "type": "text",
+              "enabled": true
+            },
+            {
+              "key": "client_id",
+              "value": "my-app",
+              "type": "text",
+              "enabled": true
+            },
+            {
+              "key": "client_secret",
+              "value": "my-app-secret",
+              "type": "text",
+              "enabled": true
+            },
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "text",
+              "enabled": true
+            },
+            {
+              "key": "password",
+              "value": "foo",
+              "type": "text",
+              "enabled": true
+            }
+          ]
+        },
+        "description": ""
+      },
+      "response": []
+    },
+    {
+      "name": "OAuth password token",
+      "request": {
+        "url": "http://0.0.0.0:8480/index-dev.php/oauth/access-token",
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "description": ""
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "grant_type",
+              "value": "password",
+              "type": "text",
+              "enabled": true
+            },
+            {
+              "key": "client_id",
+              "value": "my-app",
+              "type": "text",
+              "enabled": true
+            },
+            {
+              "key": "client_secret",
+              "value": "my-app-secret",
+              "type": "text",
+              "enabled": true
+            },
+            {
+              "key": "username",
+              "value": "admin",
+              "type": "text",
+              "enabled": true
+            },
+            {
+              "key": "password",
+              "value": "foo",
+              "type": "text",
+              "enabled": true
+            }
+          ]
+        },
+        "description": ""
+      },
+      "response": []
+    },
+    {
+      "name": "OAuth refresh token",
+      "request": {
+        "url": "http://0.0.0.0:8480/index-dev.php/oauth/access-token",
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "description": ""
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "grant_type",
+              "value": "refresh_token",
+              "type": "text",
+              "enabled": true
+            },
+            {
+              "key": "client_id",
+              "value": "my-app",
+              "type": "text",
+              "enabled": true
+            },
+            {
+              "key": "client_secret",
+              "value": "my-app-secret",
+              "type": "text",
+              "enabled": true
+            },
+            {
+              "key": "refresh_token",
+              "value": "04N1ud6WY8mHiQtDyi38vkLiMp10IlLoTSekhLBo",
+              "type": "text",
+              "enabled": true
+            }
+          ]
+        },
+        "description": ""
+      },
+      "response": []
+    }
+  ]
+}
