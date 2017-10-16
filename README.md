@@ -12,10 +12,12 @@ Sandstone extends Silex to easily mount a RestApi working together with a **Webs
 
 ## Documentation
 
-[See the documentation here](https://eole-io.github.io/sandstone/).
+[See the documentation here](https://eole-io.github.io/sandstone/)
+
+[![Sandstone documentation](sandstone-documentation.png)](https://eole-io.github.io/sandstone/)
 
 
-## Application
+## Sandstone edition
 
 If you plan to start a new real-time Rest Api application based on Sandstone,
 you may be interested by sandstone-edition.
@@ -23,26 +25,6 @@ you may be interested by sandstone-edition.
 It already integrates a Sandstone application with a docker environment, a database, debug tools...
 
 Check it out: [eole/sandstone-edition](https://github.com/eole-io/sandstone-edition).
-
-
-## Testing
-
-``` bash
-# Install dependencies
-composer install
-
-# Running tests
-vendor/bin/phpunit -c .
-
-# Checking code style
-vendor/bin/phpcs src --standard=phpcs.xml
-```
-
-Or using Docker, install dependencies and run all tests and codestyle checks:
-
-``` bash
-make
-```
 
 
 ## License
