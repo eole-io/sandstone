@@ -15,6 +15,14 @@ bundle install
 
 ### Preview
 
+Using docker:
+
+``` bash
+make
+```
+
+Or from raw installation:
+
 ``` bash
 bundle exec jekyll serve
 ```
@@ -25,6 +33,14 @@ It will watch for file changes, so just refresh after your changes.
 
 
 ## Publish
+
+Using docker:
+
+``` bash
+make publish
+```
+
+Or from raw installation:
 
 Full publish documentation script (from a blank folder):
 

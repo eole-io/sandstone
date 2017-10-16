@@ -77,6 +77,9 @@ $app->topic('chat/{channel}', function ($topicPattern) {
 
 This works the same way as Silex routes.
 
+> **Note**: See more at [Topic route parameters]({{ site.baseurl }}/topic-route-parameters.html)
+> to know how to retrieve topic route arguments.
+
 So let's create the server script:
 
 {% include file-title.html filename="chat-server.php" %}

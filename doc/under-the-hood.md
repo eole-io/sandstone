@@ -18,7 +18,7 @@ Sandstone is built on a few other cool PHP libraries you may want to check docum
 
 ## WAMP protocol v1
 
-As you can see, Sandstone uses the first version of WAMP protocol.
+Sandstone uses the first version of WAMP protocol.
 
 This choice has be done over the v2 because at this time, **server-side**,
 this version is better documented than the v2.
@@ -41,8 +41,9 @@ First, I used ZMQ to abstract socket creation and listen with PHP.
 
 But I don't want to use ZMQ directly in rest api controller to send messages,
 and make controllers dependant to ZMQ.
-<br>
-I used Symfony EventDispatcher to abstract sending messages.
+
+I wanted to send events from controllers to websocket topics by
+only dispatching Symfony events, which is **one of the main Sandstone feature**.
 
 So messages becomes events:
 
@@ -99,7 +100,8 @@ just declare the ones you want to forward with `$app->forwardEventToPushServer('
 
 ## Websocket topics
 
-I wanted to declare topics as simple as Silex does with routes.
+I wanted to declare topics as simple as Silex does with routes,
+which is **one of the main Sandstone feature**.
 
 How Silex declares a route:
 

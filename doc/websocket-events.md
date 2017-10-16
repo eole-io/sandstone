@@ -73,7 +73,8 @@ class MyWebsocketListener implements EventSubscriberInterface
 }
 ```
 
-- Then, register this listener as a Silex `EventListenerProviderInterface`
+- Then, add in a Silex provider that implements `EventListenerProviderInterface`,
+in the method `subscribe`:
 
 ``` php
 <?php
@@ -90,6 +91,21 @@ class MyProvider implements EventListenerProviderInterface
     }
 }
 ```
+
+> See more about `EventListenerProviderInterface` in
+> [Silex documentation about "Creating a provider"](https://silex.symfony.com/index.php/doc/2.0/providers.html#creating-a-provider).
+
+- Finally, register this provider in your Sandstone application:
+
+``` php
+$app->register(new MyProvider());
+```
+
+> **Note**: `$app` is your Sandstone application instance,
+> created with `$app = new Eole\Sandstone\Application()`.
+>
+> See [Full example of Sandstone application]({{ site.baseurl }}/examples/full.html)
+> to have an example to how to bootstrap a Sandstone application.
 
 
 ## Another example: listen to published messages
@@ -142,6 +158,12 @@ class MyProvider implements EventListenerProviderInterface
         $dispatcher->addSubscriber(new MyMessagePublishListener());
     }
 }
+```
+
+- Finally, register this provider in your Sandstone application:
+
+``` php
+$app->register(new MyProvider());
 ```
 
 It should display in your websocket logs something like:

@@ -2,6 +2,21 @@ body {
     font-size: 16px;
     padding-top: 60px;
 }
+h4 {
+    font-weight: 500;
+}
+h2 {
+    margin-top: 60px;
+    margin-bottom: 20px;
+}
+h3 {
+    margin-top: 45px;
+    margin-bottom: 15px;
+}
+h4 {
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
 blockquote {
     font-size: 16px;
 }

@@ -24,6 +24,22 @@
                 <span>Websocket</span>
             </a>
         </li>
+        <li {% include menu-active.html url='/authentication.html' %}>
+            <a href="{{ site.baseurl }}/authentication.html">
+                <i class="fa fa-user" aria-hidden="true"></i>
+                Authentication
+                <br>
+                <span>Rest API + websocket connections</span>
+            </a>
+        </li>
+        <li {% include menu-active.html url='/topic-route-parameters.html' %}>
+            <a href="{{ site.baseurl }}/topic-route-parameters.html">
+                <i class="fa fa-sitemap" aria-hidden="true"></i>
+                Topic route parameters
+                <br>
+                <span>Retrieve topic route arguments</span>
+            </a>
+        </li>
         <li {% include menu-active.html url='/websocket-events.html' %}>
             <a href="{{ site.baseurl }}/websocket-events.html">
                 <i class="fa fa-wifi" aria-hidden="true"></i>
@@ -38,6 +54,14 @@
                 Push debug profiler
                 <br>
                 <span>Enable that awesome debug tool !</span>
+            </a>
+        </li>
+        <li {% include menu-active.html url='/big-picture.html' %}>
+            <a href="{{ site.baseurl }}/big-picture.html">
+                <i class="fa fa-picture-o" aria-hidden="true"></i>
+                Big picture
+                <br>
+                <span>Sandstone full schema</span>
             </a>
         </li>
         <li {% include menu-active.html url='/under-the-hood.html' %}>
