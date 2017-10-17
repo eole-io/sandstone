@@ -6,8 +6,6 @@ use Psr\Log\LoggerAwareTrait;
 use ZMQ;
 use React\ZMQ\Context;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Factory;
-use React\Socket\Server as ReactSocketServer;
 use Ratchet\Server\IoServer;
 use Ratchet\Http\HttpServer;
 use Ratchet\WebSocket\WsServer;
@@ -26,17 +24,11 @@ class Server
     private $sandstoneApplication;
 
     /**
-     * @var LoopInterface
-     */
-    private $loop;
-
-    /**
      * @param SandstoneApplication $sandstoneApplication
      */
     public function __construct(SandstoneApplication $sandstoneApplication)
     {
         $this->sandstoneApplication = $sandstoneApplication;
-        $this->loop = Factory::create();
 
         $this->setLogger(new EchoLogger());
     }
@@ -46,10 +38,7 @@ class Server
      */
     private function initWebsocketServer()
     {
-        $websocketBind = $this->sandstoneApplication['sandstone.websocket.server']['bind'];
-        $websocketPort = $this->sandstoneApplication['sandstone.websocket.server']['port'];
-
-        $socket = new ReactSocketServer("$websocketBind:$websocketPort", $this->loop);
+        $socket = $this->sandstoneApplication['sandstone.websocket.socket'];
 
         new IoServer(
             new HttpServer(
@@ -61,7 +50,8 @@ class Server
                     )
                 )
             ),
-            $socket
+            $socket,
+            $this->getLoop()
         );
     }
 
@@ -73,7 +63,7 @@ class Server
         $pushBind = $this->sandstoneApplication['sandstone.push.server']['bind'];
         $pushPort = $this->sandstoneApplication['sandstone.push.server']['port'];
 
-        $context = new Context($this->loop);
+        $context = new Context($this->getLoop());
         $pushServer = $context->getSocket(ZMQ::SOCKET_PULL);
 
         $pushServer->bind("tcp://$pushBind:$pushPort");
@@ -108,6 +98,14 @@ class Server
             $this->logger->info('Bind push server', $this->sandstoneApplication['sandstone.push.server']);
         }
 
-        $this->loop->run();
+        $this->getLoop()->run();
+    }
+
+    /**
+     * @return LoopInterface
+     */
+    private function getLoop()
+    {
+        return $this->sandstoneApplication['sandstone.react_loop'];
     }
 }

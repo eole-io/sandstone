@@ -77,6 +77,8 @@ final class Application implements WampServerInterface
      */
     public function onOpen(ConnectionInterface $conn)
     {
+        var_dump(get_class($this), __METHOD__);
+
         $this->dispatch(ConnectionEvent::ON_OPEN, new ConnectionEvent($conn));
 
         $this->logger->info('Connection event', ['event' => 'open']);
@@ -184,6 +186,8 @@ final class Application implements WampServerInterface
      */
     public function onClose(ConnectionInterface $conn)
     {
+        var_dump(get_class($this), __METHOD__);
+
         $this->dispatch(ConnectionEvent::ON_CLOSE, new ConnectionEvent($conn));
 
         $this->logger->info('Connection event', ['event' => 'close']);
