@@ -27,6 +27,11 @@ It already integrates a Sandstone application with a docker environment, a datab
 Check it out: [eole/sandstone-edition](https://github.com/eole-io/sandstone-edition).
 
 
+## Changelog
+
+See [Releases page](https://github.com/eole-io/sandstone/releases).
+
+
 ## License
 
 This library is under [MIT License](LICENSE).
