@@ -51,12 +51,14 @@ final class Application implements WampServerInterface
      */
     private function authenticateUser(ConnectionInterface $conn)
     {
-        $accessToken = $conn->WebSocket->request->getQuery()->get('access_token');
+        $queryParameters = [];
+        parse_str($conn->httpRequest->getUri()->getQuery(), $queryParameters);
 
-        if (null === $accessToken) {
+        if (!isset($queryParameters['access_token'])) {
             return null;
         }
 
+        $accessToken = $queryParameters['access_token'];
         $authenticationManager = $this->sandstoneApplication['security.authentication_manager'];
 
         $authenticatedToken = $authenticationManager->authenticate(new OAuth2Token($accessToken));
