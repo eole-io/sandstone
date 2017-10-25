@@ -49,8 +49,7 @@ class Server
         $websocketBind = $this->sandstoneApplication['sandstone.websocket.server']['bind'];
         $websocketPort = $this->sandstoneApplication['sandstone.websocket.server']['port'];
 
-        $socket = new ReactSocketServer($this->loop);
-        $socket->listen($websocketPort, $websocketBind);
+        $socket = new ReactSocketServer("$websocketBind:$websocketPort", $this->loop);
 
         new IoServer(
             new HttpServer(
