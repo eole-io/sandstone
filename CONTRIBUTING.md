@@ -8,7 +8,7 @@ The project is open for contributors pull requests or issues.
 
 Sandstone requires:
 
- - PHP 5.5+ or PHP 7
+ - PHP 5.6+ or PHP 7
  - ZeroMQ
  - php-zmq PHP extension
 

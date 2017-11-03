@@ -19,7 +19,7 @@ What you can achieve with Sandstone:
 
 Sandstone needs:
 
-- PHP >= 5.5
+- PHP >= 5.6
 - ZMQ and ZMQ php extension (or see [Install ZMQ and php-zmq on Linux]({{ site.baseurl }}/install-zmq-php-linux.html))
 
 Sandstone is on composer ([eole/sandstone](https://packagist.org/packages/eole/sandstone)).

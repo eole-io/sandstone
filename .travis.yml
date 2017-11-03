@@ -7,7 +7,7 @@ services:
 matrix:
     include:
         - env: MODE=php
-          php: 5.5
+          php: 5.6
         - env: MODE=php
           php: 7.1
         - env: MODE=docker
