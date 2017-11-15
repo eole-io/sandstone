@@ -57,32 +57,6 @@ make
 
 ## Documentation
 
-This is a jekyll project.
+Documentation source code is at <https://github.com/eole-io/sandstone-doc>.
 
-Pages are at the root folder, written in markdown (`doc/*.md`).
-
-There is also full examples pages in `doc/examples/`.
-
-### Preview documentation locally
-
-There is a docker environment to preview documentation locally.
-
-Just go to `doc/`, then run make.
-
-Then go to [http://localhost:4000/sandstone/](http://localhost:4000/sandstone/) (don't forget trailing slash).
-
-See more about documentation's documentation in the readme:
-
-[Documentation Readme](https://github.com/eole-io/sandstone/tree/dev/doc).
-
-### Publishing
-
-You need write access to publish.
-
-Run:
-
-``` bash
-make publish
-```
-
-It'll ask for a third party access token.
+See [documentation contributing](https://github.com/eole-io/sandstone-doc/blob/master/CONTRIBUTING.md) page.

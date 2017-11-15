@@ -7,14 +7,17 @@
 [![License](https://poser.pugx.org/eole/sandstone/license)](https://packagist.org/packages/eole/sandstone)
 
 
-Sandstone extends Silex to easily mount a RestApi working together with a **Websocket server**.
+Sandstone is a PHP microframework designed to build a RestApi
+working together with a **websocket server**.
+
+Build a real time RestApi!
 
 
 ## Documentation
 
-[See the documentation here](https://eole-io.github.io/sandstone/)
+[See the documentation here](https://eole-io.github.io/sandstone-doc/)
 
-[![Sandstone documentation](sandstone-documentation.png)](https://eole-io.github.io/sandstone/)
+[![Sandstone documentation](sandstone-documentation.png)](https://eole-io.github.io/sandstone-doc/)
 
 
 ## Sandstone edition
@@ -24,7 +27,7 @@ you may be interested by sandstone-edition.
 
 It already integrates a Sandstone application with a docker environment, a database, debug tools...
 
-Check it out: [eole/sandstone-edition](https://github.com/eole-io/sandstone-edition).
+[Get started with Sandstone edition](https://eole-io.github.io/sandstone-doc/edition/get-started).
 
 
 ## Changelog
