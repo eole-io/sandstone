@@ -12,6 +12,12 @@ working together with a **websocket server**.
 
 Build a real time RestApi!
 
+### :speech_balloon: New (18 April 2018)
+
+I opened a chat channel where you can get help, give feedback, and talk about Sandstone (Mattermost instance):
+
+:speech_balloon: https://framateam.org/sandstone :speech_balloon:
+
 
 ## Install
 
