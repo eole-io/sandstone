@@ -1,7 +1,0 @@
-_site
-.sass-cache
-.jekyll-metadata
-Gemfile.lock
-
-# Twitter Jekyll gem (last tweets cache)
-.tweet-cache/

@@ -46,11 +46,7 @@ class PushServerDataCollector extends DataCollector
      */
     private function updateMessages(array $messages)
     {
-        $this->data = array(
-            'messages_size' => 0,
-            'messages_count' => 0,
-            'messages' => array(),
-        );
+        $this->reset();
 
         foreach ($messages as $message) {
             $messageSize = strlen($message);
@@ -80,5 +76,17 @@ class PushServerDataCollector extends DataCollector
     public function getName()
     {
         return self::NAME;
+    }
+
+    /**
+     * {@InheritDoc}
+     */
+    public function reset()
+    {
+        $this->data = array(
+            'messages_size' => 0,
+            'messages_count' => 0,
+            'messages' => array(),
+        );
     }
 }
