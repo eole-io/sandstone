@@ -51,7 +51,6 @@ make
 
 - `src/` Source code
 - `tests/` Unit tests and functionnal tests with PHPUnit
-- `doc/` Documentation with Jekyll
 - `docker/` Docker configuration for Sandstone development (running tests)
 
 
