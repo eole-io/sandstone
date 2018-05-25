@@ -38,7 +38,7 @@ $app = new Eole\Sandstone\Application();
 
 ### Declare a websocket topic
 
-Just as easy as declaring a silex route:
+Similar as declaring a Silex route:
 
 ``` php
 $app->topic('chat/{channel}', function ($topicPattern, $arguments) {
